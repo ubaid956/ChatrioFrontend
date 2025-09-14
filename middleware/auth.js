@@ -34,10 +34,10 @@ import User from '../models/User.js';
 //     try {
 //       token = req.headers.authorization.split(' ')[1];
 //       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
+
 //       // Use userId instead of id
 //       req.user = await User.findById(decoded.userId).select('-password');
-      
+
 //       return next();
 //     } catch (error) {
 //       return res.status(401).json({ message: 'Not authorized, token failed' });
@@ -79,16 +79,22 @@ const protect = async (req, res, next) => {
 const socketAuth = async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
+    console.log('Socket auth attempt with token:', token ? 'present' : 'missing');
     if (!token) throw new Error('Authentication error');
-    
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
-    
+    const userId = decoded.userId || decoded.id; // handle both formats
+    console.log('Decoded user ID:', userId);
+
+    const user = await User.findById(userId).select('-password');
+
     if (!user) throw new Error('User not found');
-    
+
     socket.user = user;
+    console.log('Socket auth successful for user:', user._id);
     next();
   } catch (err) {
+    console.log('Socket auth failed:', err.message);4
     next(new Error('Authentication failed'));
   }
 };

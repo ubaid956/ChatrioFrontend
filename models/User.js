@@ -76,7 +76,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['student', 'teacher'],
     default: 'student'
-  }
+  },
+  pushToken: { type: String, default: null },
 
 }, {
   timestamps: true,

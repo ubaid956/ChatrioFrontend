@@ -111,7 +111,7 @@ export const deleteItinerary = async (req, res) => {
 export const createChecklist = async (req, res) => {
   try {
     const { groupId, destination, travelDate, items } = req.body;
-   
+
 
     if (!destination || !travelDate?.from || !travelDate?.to || !Array.isArray(items)) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -178,7 +178,7 @@ export const splitExpense = async (req, res) => {
     const { title, amount, sharedWith, groupId } = req.body;
     const paidBy = req.user._id;
 
-    const expense = await Expense.create({ title, amount, paidBy, sharedWith, groupId , sender: req.user._id  });
+    const expense = await Expense.create({ title, amount, paidBy, sharedWith, groupId, sender: req.user._id });
     res.status(201).json({ message: "Expense recorded", expense });
   } catch (err) {
     res.status(500).json({ message: err.message });

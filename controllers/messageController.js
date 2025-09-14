@@ -1,9 +1,13 @@
 import Message from '../models/Message.js';
 
 import User from '../models/User.js';
+import Group from '../models/Group.js';
 
 import cloudinary from '../cloudinaryConfig.js';
+import * as Notifications from 'expo-server-sdk';
 
+import { onlineUsers } from '../utils/socket.js';
+import { sendExpoPush } from '../utils/push.js';
 
 // Work Imports
 import Task from '../models/features/work/task.model.js';
@@ -47,6 +51,7 @@ import Expense from '../models/features/travel/expenseSplit.model.js';
 // };
 
 
+const expo = new Notifications.Expo();
 
 export const getGroupMessages = async (req, res) => {
   try {
@@ -390,6 +395,8 @@ export const getWorkGroupMessages = async (req, res) => {
 //     res.status(500).json({ message: error.message });
 //   }
 // };
+
+
 export const createMessage = async (req, res) => {
   try {
     const { groupId, senderId, text, duration } = req.body;
@@ -437,6 +444,40 @@ export const createMessage = async (req, res) => {
       select: 'name pic currentStatus mood'
     });
 
+    // Emit to group members via socket
+    const io = req.app.get('io');
+    if (io) {
+      console.log('Emitting groupMessage to group:', groupId);
+      io.to(groupId.toString()).emit('groupMessage', populatedMessage);
+    }
+
+    // 2) Push notifications: notify offline group members (exclude sender)
+    try {
+      const group = await Group.findById(groupId).populate('members', 'pushToken name _id');
+      if (group) {
+        const senderIdStr = senderId ? senderId.toString() : (req.user?._id?.toString && req.user._id.toString());
+        const pushBody = hasText ? populatedMessage.text : '🎵 Audio message';
+        for (const member of group.members) {
+          const memberIdStr = member._id.toString();
+          if (memberIdStr === senderIdStr) continue; // don't notify sender
+
+          // Check if member is offline
+          const sockets = onlineUsers.get(memberIdStr);
+          if (!sockets || sockets.size === 0) {
+            if (member.pushToken) {
+              await sendExpoPush(member.pushToken, {
+                title: `${group.name}`,
+                body: pushBody,
+                data: { type: 'group_message', groupId, messageId: message._id }
+              });
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error sending group push notifications:', err);
+    }
+
     res.status(201).json(populatedMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -446,6 +487,8 @@ export const createMessage = async (req, res) => {
 
 
 // Send private message
+
+
 // export const sendPrivateMessage = async (req, res) => {
 //   try {
 //     const { recipientId, text } = req.body;
@@ -478,24 +521,88 @@ export const createMessage = async (req, res) => {
 //   }
 // };
 
+
+
+// Send private Message Works Perfetly ********************************
+// export const sendPrivateMessage = async (req, res) => {
+//   try {
+//     const { recipientId, text, duration } = req.body;
+
+//     // Validate recipientId
+//     const recipient = await User.findById(recipientId);
+//     if (!recipient) {
+//       return res.status(404).json({ message: 'Recipient not found' });
+//     }
+
+//     // Validate: Only one of text or audio should be present
+//     const hasText = text && text.trim() !== '';
+//     const hasAudio = req.files?.audio;
+
+//     if ((hasText && hasAudio) || (!hasText && !hasAudio)) {
+//       return res.status(400).json({
+//         message: 'Provide either a text or audio message, not both or neither.'
+//       });
+//     }
+
+//     const messageData = {
+//       sender: req.user._id,
+//       recipient: recipientId,
+//       isPrivate: true,
+//     };
+
+//     if (hasText) {
+//       messageData.text = text;
+//     }
+
+//     if (hasAudio) {
+//       const audioFile = req.files.audio;
+
+//       const uploadResult = await cloudinary.uploader.upload(audioFile.tempFilePath, {
+//         resource_type: 'video',
+//         folder: 'chat-audios'
+//       });
+
+//       messageData.audio = {
+//         url: uploadResult.secure_url,
+//         duration: duration ? Number(duration) : undefined,
+//         mimeType: audioFile.mimetype
+//       };
+//     }
+//     // console.log(messageData.audio.url)
+
+//     const message = await Message.create(messageData);
+
+//     console.log('Message:', message)
+
+//     const populatedMsg = await Message.populate(message, {
+//       path: 'sender recipient',
+//       select: 'name pic'
+//     });
+
+//     res.status(201).json(populatedMsg);
+//   } catch (error) {
+//     console.error('Error sending private message:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+
+// Send Private Message with Push Notifications
 export const sendPrivateMessage = async (req, res) => {
   try {
     const { recipientId, text, duration } = req.body;
+    const io = req.app.get('io');
 
-    // Validate recipientId
     const recipient = await User.findById(recipientId);
-    if (!recipient) {
-      return res.status(404).json({ message: 'Recipient not found' });
-    }
+    if (!recipient) return res.status(404).json({ message: 'Recipient not found' });
 
-    // Validate: Only one of text or audio should be present
-    const hasText = text && text.trim() !== '';
+    // Check if it's an audio message or text message
     const hasAudio = req.files?.audio;
+    const hasText = text && text.trim() !== '';
 
     if ((hasText && hasAudio) || (!hasText && !hasAudio)) {
-      return res.status(400).json({
-        message: 'Provide either a text or audio message, not both or neither.'
-      });
+      return res.status(400).json({ message: 'Provide either a text or audio message, not both or neither.' });
     }
 
     const messageData = {
@@ -522,23 +629,39 @@ export const sendPrivateMessage = async (req, res) => {
         mimeType: audioFile.mimetype
       };
     }
-    // console.log(messageData.audio.url)
 
     const message = await Message.create(messageData);
-
-    console.log('Message:' , message)
 
     const populatedMsg = await Message.populate(message, {
       path: 'sender recipient',
       select: 'name pic'
     });
 
+    // 1) In-app realtime
+    console.log('Emitting privateMessage to recipient:', recipientId.toString());
+    console.log('Message data:', populatedMsg);
+    io.to(recipientId.toString()).emit('privateMessage', populatedMsg);
+
+    // 2) Push if recipient is offline
+    const sockets = onlineUsers.get(recipientId.toString());
+    if (!sockets || sockets.size === 0) {
+      if (recipient.pushToken) {
+        const pushBody = hasText ? populatedMsg.text : '🎵 Audio message';
+        await sendExpoPush(recipient.pushToken, {
+          title: `${populatedMsg.sender.name}`,
+          body: pushBody,
+          data: { type: 'chat_message', messageId: message._id }
+        });
+      }
+    }
+
     res.status(201).json(populatedMsg);
   } catch (error) {
-    console.error('Error sending private message:', error);
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Failed to send message' });
   }
 };
+
 
 
 
@@ -562,7 +685,8 @@ export const getPrivateChat = async (req, res) => {
         recipient: msg.recipient,
         isPrivate: msg.isPrivate,
         createdAt: msg.createdAt,
-        updatedAt: msg.updatedAt
+        updatedAt: msg.updatedAt,
+        isSentByMe: msg.sender._id.toString() === req.user._id.toString()
       };
 
       if (msg.text) {
@@ -576,6 +700,13 @@ export const getPrivateChat = async (req, res) => {
           duration: msg.audio.duration || null
         };
       }
+
+      // Add formatted time
+      message.time = new Date(msg.createdAt).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
 
       return message;
     });

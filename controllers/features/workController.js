@@ -61,7 +61,7 @@ export const getGroupTasks = async (req, res) => {
 export const scheduleMeeting = async (req, res) => {
   try {
     const { groupId, title, scheduledAt, attendees } = req.body;
-    const meeting = await Meeting.create({ groupId, title, scheduledAt, attendees, sender: req.user._id});
+    const meeting = await Meeting.create({ groupId, title, scheduledAt, attendees, sender: req.user._id });
     res.status(201).json(meeting);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -108,7 +108,7 @@ export const createGoogleMeet = async (req, res) => {
 
 
 export const createMeeting = async (req, res) => {
-  const { topic, startTime, duration , groupId} = req.body;
+  const { topic, startTime, duration, groupId } = req.body;
 
   try {
     const accessToken = await generateZoomAccessToken();
@@ -182,7 +182,7 @@ export const getGroupMeetings = async (req, res) => {
 // Ideas
 export const postIdea = async (req, res) => {
   try {
-    const { groupId, content, title  } = req.body;
+    const { groupId, content, title } = req.body;
     const idea = await Idea.create({ groupId, content, sender: req.user._id, title });
     res.status(201).json(idea);
   } catch (error) {

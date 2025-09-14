@@ -5,8 +5,8 @@ import sendMail from '../utils/sendmail.js';
 import Message from '../models/Message.js';
 import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
-
 import sendOTPViaSMS from '../utils/sendSMS.js'
+import { getAuth } from 'firebase-admin/auth';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 import cloudinary from '../cloudinaryConfig.js';
@@ -92,90 +92,33 @@ export const register = async (req, res) => {
 // @desc    Authenticate user
 
 // Login with phone and password working perfectly 
-export const login = async (req, res) => {
-  try {
-    const { phone, password } = req.body;
-
-    // 1. Check if user exists
-    const user = await User.findOne({ phone }).select('+password'); // Explicitly select password
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    // 2. Compare passwords (ensure password is not undefined)
-    if (!password || !user.password) {
-      return res.status(400).json({ message: 'Password missing' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // 3. Generate token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '30d',
-    });
-
-    // 4. Return response (exclude password)
-    const userWithoutPassword = { ...user._doc };
-    delete userWithoutPassword.password;
-
-    res.json({
-      ...userWithoutPassword,
-      token,
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-//Login works with firebase phone auth 
-
 // export const login = async (req, res) => {
 //   try {
-//     const { phone, password, firebaseToken } = req.body;
+//     const { phone, password } = req.body;
 
 //     // 1. Check if user exists
-//     const user = await User.findOne({ phone });
+//     const user = await User.findOne({ phone }).select('+password'); // Explicitly select password
 //     if (!user) {
 //       return res.status(400).json({ message: 'User not found' });
 //     }
 
-//     // 2. Handle Firebase phone authentication
-//     if (firebaseToken) {
-//       // Verify Firebase token (you'll need to implement this)
-//       const firebaseUser = await verifyFirebaseToken(firebaseToken);
-
-//       if (!firebaseUser || firebaseUser.phone_number !== `+${phone}`) {
-//         return res.status(400).json({ message: 'Firebase verification failed' });
-//       }
-
-//       // Firebase verification successful - proceed to generate token
-//     } 
-//     // 3. Handle password authentication (existing flow)
-//     else if (password) {
-//       if (!user.password) {
-//         return res.status(400).json({ message: 'Password not set for this user' });
-//       }
-
-//       const isMatch = await bcrypt.compare(password, user.password);
-//       if (!isMatch) {
-//         return res.status(400).json({ message: 'Invalid credentials' });
-//       }
-//     } else {
-//       return res.status(400).json({ message: 'Authentication method required' });
+//     // 2. Compare passwords (ensure password is not undefined)
+//     if (!password || !user.password) {
+//       return res.status(400).json({ message: 'Password missing' });
 //     }
 
-//     // 4. Generate token (common for both methods)
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
+
+//     // 3. Generate token
 //     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
 //       expiresIn: '30d',
 //     });
 
-//     // 5. Return response (exclude password)
-//     const userWithoutPassword = user.toObject();
+//     // 4. Return response (exclude password)
+//     const userWithoutPassword = { ...user._doc };
 //     delete userWithoutPassword.password;
 
 //     res.json({
@@ -188,17 +131,74 @@ export const login = async (req, res) => {
 //   }
 // };
 
-// Helper function to verify Firebase token
-// async function verifyFirebaseToken(idToken) {
-//   const auth = getAuth();
-//   try {
-//     const decodedToken = await auth.verifyIdToken(idToken);
-//     return decodedToken;
-//   } catch (error) {
-//     console.error('Firebase token verification error:', error);
-//     return null;
-//   }
-// }
+
+//Login works with firebase phone auth 
+
+export const login = async (req, res) => {
+  try {
+    const { phone, password, firebaseToken } = req.body;
+
+    // 1. Check if user exists
+    const user = await User.findOne({ phone });
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    // 2. Handle Firebase phone authentication
+    if (firebaseToken) {
+      // Verify Firebase token (you'll need to implement this)
+      const firebaseUser = await verifyFirebaseToken(firebaseToken);
+
+      if (!firebaseUser || firebaseUser.phone_number !== `+${phone}`) {
+        return res.status(400).json({ message: 'Firebase verification failed' });
+      }
+
+      // Firebase verification successful - proceed to generate token
+    }
+    // 3. Handle password authentication (existing flow)
+    else if (password) {
+      if (!user.password) {
+        return res.status(400).json({ message: 'Password not set for this user' });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+    } else {
+      return res.status(400).json({ message: 'Authentication method required' });
+    }
+
+    // 4. Generate token (common for both methods)
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '30d',
+    });
+
+    // 5. Return response (exclude password)
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+
+    res.json({
+      ...userWithoutPassword,
+      token,
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// // Helper function to verify Firebase token
+async function verifyFirebaseToken(idToken) {
+  const auth = getAuth();
+  try {
+    const decodedToken = await auth.verifyIdToken(idToken);
+    return decodedToken;
+  } catch (error) {
+    console.error('Firebase token verification error:', error);
+    return null;
+  }
+}
 
 
 
@@ -292,6 +292,44 @@ export const googleSignIn = async (req, res) => {
   }
 };
 
+
+// export const googleSignIn = async (req, res) => {
+//   const { token } = req.body;
+
+//   try {
+//     // ✅ Verify ID Token
+//     const ticket = await client.verifyIdToken({
+//       idToken: token,
+//       audience: process.env.GOOGLE_CLIENT_ID, // web/ios/android client ID
+//     });
+//     const payload = ticket.getPayload();
+
+//     const { email, name, picture, sub: googleId } = payload;
+
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       user = await User.create({
+//         name,
+//         email,
+//         pic: picture,
+//         googleId,
+//         authType: 'google',
+//         password: 'google_auth',
+//       });
+//     }
+
+//     const appToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: '7d',
+//     });
+
+//     res.status(200).json({ token: appToken, user });
+//   } catch (err) {
+//     console.error('Google Sign-In Error:', err.message);
+//     res.status(401).json({ message: 'Google authentication failed' });
+//   }
+// };
+
+
 export const getAllUsers = async (req, res) => {
   try {
     // Get the logged-in user's ID from the request (assuming you have auth middleware)
@@ -329,6 +367,8 @@ export const getAllUsers = async (req, res) => {
           ...user.toObject(),
           lastPreviewMessage: lastPrivateMessage?.text || null,
           lastPreviewTime: formatTime(lastPrivateMessage?.createdAt) || null,
+          // Raw timestamp for reliable client-side sorting
+          lastPreviewAt: lastPrivateMessage?.createdAt || null,
         };
       })
     );
@@ -399,20 +439,34 @@ export const getUserById = async (req, res) => {
       ]
     })
       .sort({ createdAt: 1 }) // Sort by oldest first (use -1 for newest first)
-      .select('text createdAt sender')
+      .select('_id text audio createdAt sender')
       .lean();
 
     // Format messages with additional info
-    const formattedMessages = messages.map(message => ({
-      text: message.text,
-      time: new Date(message.createdAt).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }),
-      date: new Date(message.createdAt).toLocaleDateString(),
-      isSentByMe: message.sender.toString() === loggedInUserId.toString()
-    }));
+    const formattedMessages = messages.map(message => {
+      const formatted = {
+        _id: message._id,
+        text: message.text,
+        time: new Date(message.createdAt).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        }),
+        date: new Date(message.createdAt).toLocaleDateString(),
+        isSentByMe: message.sender.toString() === loggedInUserId.toString()
+      };
+
+      // Only include audio if it has a valid URL
+      if (message.audio && message.audio.url) {
+        formatted.audio = {
+          url: message.audio.url,
+          mimeType: message.audio.mimeType || 'audio/mpeg',
+          duration: message.audio.duration || null
+        };
+      }
+
+      return formatted;
+    });
 
     res.status(200).json({
       success: true,
@@ -754,5 +808,53 @@ export const profilePic = async (req, res) => {
   } catch (error) {
     console.error("Error updating profile picture:", error);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updatePushToken = async (req, res) => {
+  try {
+    const { userId, pushToken } = req.body;
+
+    if (!userId || !pushToken) {
+      return res.status(400).json({ success: false, message: "userId and pushToken required" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { pushToken },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, pushToken: user.pushToken });
+  } catch (error) {
+    console.error("updatePushToken error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+
+export const getLoggedInUser = async (req, res) => {
+  try {
+    // req.user is populated by your `protect` middleware
+    const userId = req.user._id;
+
+    // Find user by ID
+    const user = await User.findById(userId)
+      .populate('groups', 'name') // populate groups with only name field
+      .populate('currentGroup', 'name'); // populate current group if needed
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Error fetching logged-in user:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };

@@ -1,8 +1,10 @@
 import express from 'express';
 
-import { register, login,
-googleSignIn, 
-     emailVerify, verifyOtp, updatePassword, getAllUsers, getUserById ,profilePic,updateProfile, sendOtp,} from '../controllers/authController.js';
+import {
+     register, login,
+     googleSignIn,
+     emailVerify, verifyOtp, updatePassword, getAllUsers, getUserById, profilePic, updateProfile, sendOtp, updatePushToken, getLoggedInUser
+} from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 const router = express.Router();
 
@@ -10,7 +12,7 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/google', googleSignIn);
 
-router.get('/users',protect, getAllUsers)
+router.get('/users', protect, getAllUsers)
 
 //get user by id and all the chats bw specific user and logged in user
 router.get('/users/:id', protect, getUserById)
@@ -24,4 +26,9 @@ router.patch('/users/updatePassword', updatePassword);
 // router.post('/users/profile', protect, profilePic)
 router.put('/users/profile', protect, updateProfile);
 router.post('/users/sendotp', sendOtp)
+router.post('/updatePushToken', updatePushToken);
+
+router.get('/me', protect, getLoggedInUser);
+
+
 export default router;

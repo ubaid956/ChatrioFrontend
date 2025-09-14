@@ -1,6 +1,8 @@
+// utils/socket.js
 import { Server } from 'socket.io';
 import { socketAuth } from '../middleware/auth.js';
-import Message from '../models/Message.js';
+
+export const onlineUsers = new Map(); // userId -> Set<socketIds>
 
 const initSocket = (httpServer) => {
   const io = new Server(httpServer, {
@@ -11,39 +13,61 @@ const initSocket = (httpServer) => {
   });
 
   io.use(socketAuth).on('connection', (socket) => {
-    console.log(`User connected: ${socket.user._id}`);
+    const userId = socket.user._id.toString();
+    console.log(`User connected: ${userId}, socketId: ${socket.id}`);
 
-    // Join user to their groups
+    // Track online user
+    const set = onlineUsers.get(userId) || new Set();
+    set.add(socket.id);
+    onlineUsers.set(userId, set);
+
+    // Also join personal room for private messages
+    socket.join(userId);
+    console.log(`User ${userId} joined personal room: ${userId}`);
+
+    // Join user groups
     socket.on('joinGroups', async () => {
       const groups = socket.user.groups || [];
       groups.forEach(groupId => {
         socket.join(groupId.toString());
-        console.log(`User ${socket.user._id} joined group ${groupId}`);
+        console.log(`User ${userId} joined group ${groupId}`);
       });
     });
 
-    // Handle new messages
-    socket.on('sendMessage', async ({ groupId, text }) => {
+    // Join specific group room
+    socket.on('joinGroup', (groupId) => {
+      socket.join(groupId.toString());
+      console.log(`User ${userId} joined group room: ${groupId}`);
+    });
+
+    // Handle direct socket message sending (for real-time delivery)
+    socket.on('sendPrivateMessage', async (data) => {
       try {
-        const message = await Message.create({
-          sender: socket.user._id,
-          group: groupId,
-          text
+        console.log('Received sendPrivateMessage via socket:', data);
+        const { recipientId, text } = data;
+
+        // Emit to recipient immediately
+        io.to(recipientId.toString()).emit('privateMessage', {
+          _id: `temp-${Date.now()}`,
+          sender: socket.user,
+          recipient: recipientId,
+          text: text,
+          createdAt: new Date(),
+          isPrivate: true
         });
 
-        const populatedMsg = await Message.populate(message, {
-          path: 'sender',
-          select: 'name pic currentStatus mood'
-        });
-
-        io.to(groupId.toString()).emit('newMessage', populatedMsg);
-      } catch (err) {
-        console.error('Message send error:', err);
+        console.log(`Socket message sent to recipient: ${recipientId}`);
+      } catch (error) {
+        console.error('Error handling socket message:', error);
       }
     });
 
     socket.on('disconnect', () => {
-      console.log(`User disconnected: ${socket.user._id}`);
+      console.log(`User disconnected: ${userId}`);
+      const set = onlineUsers.get(userId);
+      if (!set) return;
+      set.delete(socket.id);
+      if (set.size === 0) onlineUsers.delete(userId);
     });
   });
 
