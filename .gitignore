@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-base-apk/
+base.apk/
 
 # Expo
 .expo/
