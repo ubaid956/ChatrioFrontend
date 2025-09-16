@@ -1,0 +1,92 @@
+{
+  "continue": "استمرار",
+  "continue_with_google": "تابع باستخدام جوجل",
+  "continue_with_apple": "تابع باستخدام أبل",
+  "dont_have_account": "ليس لديك حساب؟",
+  "signup": "إنشاء حساب",
+  "phone_number": "رقم الهاتف",
+  "phone_too_short": "رقم الهاتف قصير جدًا",
+  "phone_required": "رقم الهاتف مطلوب",  
+
+
+    "create_account": "إنشاء حساب",
+  "full_name": "الاسم الكامل",
+  "email": "البريد الإلكتروني",
+  "phone_number": "رقم الهاتف",
+  "password": "كلمة المرور",
+  "confirm_password": "تأكيد كلمة المرور",
+  "continue": "متابعة",
+  "already_have_account": "لديك حساب بالفعل؟",
+  "login": "تسجيل الدخول",
+  "full_name_required": "الاسم الكامل مطلوب",
+  "invalid_email": "البريد الإلكتروني غير صالح",
+  "email_required": "البريد الإلكتروني مطلوب",
+  "phone_too_short": "رقم الهاتف قصير جدًا",
+  "phone_required": "رقم الهاتف مطلوب",
+  "password_too_short": "كلمة المرور قصيرة جدًا",
+  "password_required": "كلمة المرور مطلوبة",
+  "passwords_do_not_match": "كلمتا المرور غير متطابقتين",
+  "confirm_password_required": "تأكيد كلمة المرور مطلوب",
+  "password_rules": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل وتحتوي على حروف وأرقام",
+  "success": "نجاح",
+  "account_created": "تم إنشاء الحساب بنجاح!",
+  "error": "خطأ",
+  "account_creation_failed": "فشل في إنشاء الحساب",
+  "something_went_wrong": "حدث خطأ ما. حاول مرة أخرى.",
+
+
+  "home": "الرئيسية",
+  "app_name": "تشاتريو",
+  "recent_conversations": "المحادثات الأخيرة",
+  "no_recent_chats": "لا توجد محادثات حديثة",
+
+  "tabs": {
+    "chats": "الدردشات",
+    "groups": "المجموعات",
+    "profile": "الملف الشخصي"
+  },
+
+  "greeting": "صباح الخير، {{name}}",
+  "readyMessage": "هل أنت مستعد لجعل يومك مثمراً؟",
+  "categories": {
+    "title": "الفئات",
+    "work": "العمل",
+    "home": "المنزل",
+    "school": "المدرسة",
+    "travel": "السفر"
+  },
+  "todayHighlights": "أبرز أحداث اليوم",
+  "noGroups": "لا توجد مجموعات متاحة",
+  "members": "أعضاء",
+
+  "profile": {
+    "noUserData": "لا توجد بيانات مستخدم. يرجى تسجيل الدخول مرة أخرى.",
+    "accountInformation": "معلومات الحساب",
+    "notProvided": "غير متوفر",
+    "recentActivity": "النشاط الأخير",
+    "savedItems": "العناصر المحفوظة",
+    "reviews": "المراجعات والتقييمات",
+    "settingsSupport": "الإعدادات والدعم",
+    "accountSettings": "إعدادات الحساب",
+    "helpCenter": "مركز المساعدة",
+    "termsPrivacy": "الشروط والخصوصية",
+    "logout": "تسجيل الخروج",
+    "successAbout": "تم تحديث الحالة بنجاح",
+    "errorAbout": "فشل في تحديث الحالة",
+    "permissionRequired": "الإذن مطلوب",
+    "photosPermission": "نحتاج الوصول إلى صورك لرفع صورة الملف الشخصي",
+    "successProfilePic": "تم تحديث صورة الملف الشخصي بنجاح",
+    "errorProfilePic": "فشل في رفع صورة الملف الشخصي",
+    "errorLogout": "خطأ في تسجيل الخروج"
+  },
+
+
+
+  "welcome": "مرحباً",
+  "adaptive_platform": "منصة تواصل تكيفية",
+  "smart_ui": "🤖 واجهة ذكية – تتكيف مع حالتك المزاجية، وقتك، وروتينك.",
+  "chat_seamlessly": "💬 دردش بسهولة – محادثات خاصة أو جماعية، في الوقت الفعلي.",
+  "flexible_groups": "👥 مجموعات مرنة – تنقل بين دوائر المنزل، المدرسة، والعمل.",
+  "create_account": "إنشاء حساب",
+  "login": "تسجيل الدخول"
+}

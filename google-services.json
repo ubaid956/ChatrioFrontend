@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "250145305468",
+    "project_id": "chatrio-c889c",
+    "storage_bucket": "chatrio-c889c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250145305468:android:e348583a6ae326ef3b6af9",
+        "android_client_info": {
+          "package_name": "com.uaesoft.chatrio2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "250145305468-oha5oo05v2i0d5l3k1fvh2esdgdq56qg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uaesoft.chatrio2",
+            "certificate_hash": "ea0c38816fbd37c4423410811e2c19bbd8b83c1f"
+          }
+        },
+        {
+          "client_id": "250145305468-nc9215v70cs4v9viehtl2t0nmvh94885.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfSGotrAISQlpvFwklBtZ1v_ST-tRhgyY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "250145305468-nc9215v70cs4v9viehtl2t0nmvh94885.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "250145305468-8stvalelmccdqrevg7uertv35t3k6iv1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.uaesoft.chatrio2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

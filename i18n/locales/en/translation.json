@@ -1,0 +1,92 @@
+{
+  "continue": "Continue",
+  "continue_with_google": "Continue with Google",
+  "continue_with_apple": "Continue with Apple",
+  "dont_have_account": "Don't have an Account?",
+  "signup": "Signup",
+  "phone_number": "Phone Number",
+  "phone_too_short": "Phone number too short",
+  "phone_required": "Phone number is required",
+
+  "create_account": "Create Account",
+  "full_name": "Full Name",
+  "email": "Email",
+  "phone_number": "Phone Number",
+  "password": "Password",
+  "confirm_password": "Confirm Password",
+  "continue": "Continue",
+  "already_have_account": "Already have an account?",
+  "login": "Log in",
+  "full_name_required": "Full name is required",
+  "invalid_email": "Invalid email",
+  "email_required": "Email is required",
+  "phone_too_short": "Phone number too short",
+  "phone_required": "Phone number is required",
+  "password_too_short": "Password too short",
+  "password_required": "Password is required",
+  "passwords_do_not_match": "Passwords do not match",
+  "confirm_password_required": "Confirm Password is required",
+  "password_rules": "Password must be at least 6 characters with letters and numbers",
+  "success": "Success",
+  "account_created": "Account Created Successfully!",
+  "error": "Error",
+  "account_creation_failed": "Failed to create account",
+  "something_went_wrong": "Something went wrong. Please try again.",
+
+  // Chat Page
+
+  "home": "Home",
+  "app_name": "Chatrio",
+  "recent_conversations": "Recent Conversations",
+  "no_recent_chats": "No recent chats",
+
+  "tabs": {
+    "chats": "Chats",
+    "groups": "Groups",
+    "profile": "Profile"
+  },
+
+  "greeting": "Good Morning, {{name}}",
+  "readyMessage": "Ready to make today productive?",
+  "categories": {
+    "title": "Categories",
+    "work": "Work",
+    "home": "Home",
+    "school": "School",
+    "travel": "Travel"
+  },
+  "todayHighlights": "Today Highlights",
+  "noGroups": "No groups available",
+  "members": "members",
+
+
+  "profile": {
+    "noUserData": "No user data found. Please login again.",
+    "accountInformation": "ACCOUNT INFORMATION",
+    "notProvided": "Not provided",
+    "recentActivity": "RECENT ACTIVITY",
+    "savedItems": "Saved Items",
+    "reviews": "Review & Ratings",
+    "settingsSupport": "SETTINGS & SUPPORT",
+    "accountSettings": "Account Settings",
+    "helpCenter": "Help Center",
+    "termsPrivacy": "Terms & Privacy",
+    "logout": "Log out",
+    "successAbout": "About status updated successfully",
+    "errorAbout": "Failed to update about status",
+    "permissionRequired": "Permission required",
+    "photosPermission": "We need access to your photos to upload a profile picture",
+    "successProfilePic": "Profile picture updated successfully",
+    "errorProfilePic": "Failed to upload profile picture",
+    "errorLogout": "Logout Error"
+  },
+
+  
+  "welcome": "Welcome",
+  "adaptive_platform": "An Adaptive Communication Platform",
+  "smart_ui": "🤖 Smart UI – Adapts to your mood, time, and routine.",
+  "chat_seamlessly": "💬 Chat Seamlessly – Private or group messaging, in real time.",
+  "flexible_groups": "👥 Flexible Groups – Switch between home, school, and work social circles.",
+  "create_account": "Create an Account",
+  "login": "Login"
+}
