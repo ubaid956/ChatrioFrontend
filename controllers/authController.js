@@ -6,7 +6,7 @@ import Message from '../models/Message.js';
 import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 import sendOTPViaSMS from '../utils/sendSMS.js'
-import { getAuth } from 'firebase-admin/auth';
+import { adminAuth } from '../config/firebase.js';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 import cloudinary from '../cloudinaryConfig.js';
@@ -146,11 +146,20 @@ export const login = async (req, res) => {
 
     // 2. Handle Firebase phone authentication
     if (firebaseToken) {
-      // Verify Firebase token (you'll need to implement this)
+      // Verify Firebase token
       const firebaseUser = await verifyFirebaseToken(firebaseToken);
 
-      if (!firebaseUser || firebaseUser.phone_number !== `+${phone}`) {
+      if (!firebaseUser) {
         return res.status(400).json({ message: 'Firebase verification failed' });
+      }
+
+      // Check if the phone number matches (handle different formats)
+      const firebasePhone = firebaseUser.phone_number;
+      const normalizedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+
+      if (firebasePhone !== normalizedPhone) {
+        console.log('Phone mismatch:', { firebasePhone, normalizedPhone, originalPhone: phone });
+        return res.status(400).json({ message: 'Phone number mismatch' });
       }
 
       // Firebase verification successful - proceed to generate token
@@ -188,11 +197,10 @@ export const login = async (req, res) => {
   }
 };
 
-// // Helper function to verify Firebase token
+// Helper function to verify Firebase token
 async function verifyFirebaseToken(idToken) {
-  const auth = getAuth();
   try {
-    const decodedToken = await auth.verifyIdToken(idToken);
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
     return decodedToken;
   } catch (error) {
     console.error('Firebase token verification error:', error);
