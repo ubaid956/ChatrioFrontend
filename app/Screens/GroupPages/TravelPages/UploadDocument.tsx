@@ -78,7 +78,7 @@
 //       });
 
 //       const response = await axios.post(
-//         `https://32b5245c5f10.ngrok-free.app/api/travel/document/${groupId}`,
+//         `https://37prw4st-5000.asse.devtunnels.ms/api/travel/document/${groupId}`,
 //         formData,
 //         {
 //           headers: {
@@ -268,8 +268,8 @@ const UploadDocument = () => {
       // ✅ Set the correct endpoint based on context
       const endpoint =
         context === 'school'
-          ? `https://32b5245c5f10.ngrok-free.app/api/school/uploadResource/${groupId}`
-          : `https://32b5245c5f10.ngrok-free.app/api/travel/document/${groupId}`;
+          ? `https://37prw4st-5000.asse.devtunnels.ms/api/school/uploadResource/${groupId}`
+          : `https://37prw4st-5000.asse.devtunnels.ms/api/travel/document/${groupId}`;
 
       const response = await axios.post(endpoint, formData, {
         headers: {
@@ -300,6 +300,8 @@ const UploadDocument = () => {
           <Text style={groupStyle.label}>Title</Text>
           <TextInput
             placeholder="Document Title"
+            placeholderTextColor="#999"
+
             value={title}
             onChangeText={setTitle}
             style={groupStyle.input}

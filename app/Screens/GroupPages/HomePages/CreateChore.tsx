@@ -40,7 +40,7 @@ const CreateChore = () => {
             try {
                 const token = await AsyncStorage.getItem('userToken');
                 const response = await axios.get(
-                    `https://32b5245c5f10.ngrok-free.app/api/groups/${groupId}/users`,
+                    `https://37prw4st-5000.asse.devtunnels.ms/api/groups/${groupId}/users`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setUsers(response.data.users);
@@ -64,7 +64,7 @@ const CreateChore = () => {
 
             const payload = { groupId, ...formData, sender };
             const response = await axios.post(
-                'https://32b5245c5f10.ngrok-free.app/api/home/createChore',
+                'https://37prw4st-5000.asse.devtunnels.ms/api/home/createChore',
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -91,6 +91,8 @@ const CreateChore = () => {
                     <Text style={groupStyle.label}>Task</Text>
                     <TextInput
                         placeholder="Enter Task"
+                        placeholderTextColor="#999"
+
                         value={formData.task}
                         onChangeText={(text) => handleChange('task', text)}
                         style={groupStyle.input}

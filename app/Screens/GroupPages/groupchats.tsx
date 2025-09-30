@@ -7,6 +7,7 @@ import {
     FlatList,
     Keyboard,
     KeyboardAvoidingView,
+    Linking,
     Platform,
     StyleSheet,
     Text,
@@ -42,6 +43,7 @@ import * as FileSystem from 'expo-file-system';
 
 import MessageHeader from '@/app/Components/MessageHeader';
 import { connectSocket, getSocket } from '@/utils/socket';
+import { globalStyles } from '@/Styles/globalStyles';
 
 
 const { width, height } = Dimensions.get('window');
@@ -223,7 +225,7 @@ const GroupChatScreen = () => {
 
             if (!token) return console.error('Token not found');
 
-            const endpoint = `https://32b5245c5f10.ngrok-free.app/api/messages/${groupId}/${groupType.toLowerCase()}`;
+            const endpoint = `https://37prw4st-5000.asse.devtunnels.ms/api/messages/${groupId}/${groupType.toLowerCase()}`;
             console.log(`Fetching from endpoint: ${endpoint}`);
 
             const response = await axios.get(endpoint, {
@@ -804,49 +806,6 @@ const GroupChatScreen = () => {
 
         return () => keyboardDidShowListener.remove();
     }, []);
-
-    // const handleSendMessage = async () => {
-    //     if (!input.trim()) return;
-
-    //     try {
-    //         const token = await AsyncStorage.getItem('userToken');
-    //         const senderId = await AsyncStorage.getItem('userId');
-
-    //         const response = await axios.post(
-    //             'https://32b5245c5f10.ngrok-free.app/api/messages/group',
-    //             {
-    //                 groupId,
-    //                 senderId,
-    //                 text: input.trim()
-    //             },
-    //             {
-    //                 headers: { Authorization: `Bearer ${token}` },
-    //             }
-    //         );
-
-    //         const newMsg = response.data;
-    //         const formattedMessage = {
-    //             id: newMsg._id,
-    //             type: 'text',
-    //             text: newMsg.text,
-    //             senderId: newMsg.sender._id,
-    //             senderName: newMsg.sender.name,
-    //             senderPic: newMsg.sender.pic,
-    //             createdAt: newMsg.createdAt,
-    //             time: new Date(newMsg.createdAt).toLocaleTimeString([], {
-    //                 hour: '2-digit',
-    //                 minute: '2-digit',
-    //             }),
-    //         };
-
-    //         setMessages((prev) => [...prev, formattedMessage]);
-    //         setInput('');
-    //         flatListRef.current?.scrollToEnd({ animated: true });
-    //     } catch (error) {
-    //         console.error('Error sending message:', error);
-    //     }
-    // };
-
     const handleSendMessage = async (audioUri = null, duration = null) => {
         try {
             const token = await AsyncStorage.getItem('userToken');
@@ -870,7 +829,7 @@ const GroupChatScreen = () => {
                 });
 
                 const response = await axios.post(
-                    'https://32b5245c5f10.ngrok-free.app/api/messages/group',
+                    'https://37prw4st-5000.asse.devtunnels.ms/api/messages/group',
                     formData,
                     {
                         headers: {
@@ -903,7 +862,7 @@ const GroupChatScreen = () => {
             // For text messages
             else if (input.trim()) {
                 const response = await axios.post(
-                    'https://32b5245c5f10.ngrok-free.app/api/messages/group',
+                    'https://37prw4st-5000.asse.devtunnels.ms/api/messages/group',
                     {
                         groupId,
                         senderId,
@@ -972,7 +931,7 @@ const GroupChatScreen = () => {
             );
 
             const response = await axios.post(
-                `https://32b5245c5f10.ngrok-free.app/api/work/poll/${pollId}/vote`,
+                `https://37prw4st-5000.asse.devtunnels.ms/api/work/poll/${pollId}/vote`,
                 { optionIndex },
                 {
                     headers: {
@@ -1602,10 +1561,15 @@ const GroupChatScreen = () => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 35 : 30}
             >
 
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <TouchableWithoutFeedback onPress={() => {
+                    Keyboard.dismiss();
+                    if (showAttachmentOptions) {
+                        setShowAttachmentOptions(false);
+                    }
+                }}>
                     <View style={{ flex: 1 }}>
                         <MessageHeader
                             onBackPress={() => navigation.goBack()}
@@ -1680,36 +1644,43 @@ const GroupChatScreen = () => {
                                 </View>
                             ) : (
                                 <>
-                                    <TouchableOpacity onPress={handlePlusPress} style={{ marginRight: 10 }}>
-                                        <FontAwesome6 name="add" size={28} color="#694df0" />
-                                    </TouchableOpacity>
-
-                                    <TextInput
-                                        placeholder="Message..."
-                                        ref={inputRef}
-                                        style={styles.input}
-                                        value={input}
-                                        onChangeText={setInput}
-                                        multiline
-                                        onFocus={() => {
-                                            flatListRef.current?.scrollToEnd({ animated: true });
-                                        }}
-                                    />
-
-                                    <TouchableOpacity
-                                        onPress={() => input.trim() ? handleSendMessage() : startRecording()}
-                                        onLongPress={startRecording}
+                                    <View
+                                        style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingBottom: height * 0.01 }}
                                     >
-                                        {input.trim() ? (
-                                            <Ionicons name="send" size={28} color="#694df0" />
-                                        ) : (
-                                            <Ionicons
-                                                name={isRecording ? "mic-off" : "mic"}
-                                                size={28}
-                                                color={isRecording ? "red" : "#694df0"}
-                                            />
-                                        )}
-                                    </TouchableOpacity>
+
+                                        <TouchableOpacity onPress={handlePlusPress} style={{ marginRight: 10 }}>
+                                            <FontAwesome6 name="add" size={28} color="#694df0" />
+                                        </TouchableOpacity>
+
+                                        <TextInput
+                                            placeholder="Message..."
+                                            placeholderTextColor="#999"
+
+                                            ref={inputRef}
+                                            style={globalStyles.input}
+                                            value={input}
+                                            onChangeText={setInput}
+                                            multiline
+                                            onFocus={() => {
+                                                flatListRef.current?.scrollToEnd({ animated: true });
+                                            }}
+                                        />
+
+                                        <TouchableOpacity
+                                            onPress={() => input.trim() ? handleSendMessage() : startRecording()}
+                                            onLongPress={startRecording}
+                                        >
+                                            {input.trim() ? (
+                                                <Ionicons name="send" size={28} color="#694df0" />
+                                            ) : (
+                                                <Ionicons
+                                                    name={isRecording ? "mic-off" : "mic"}
+                                                    size={28}
+                                                    color={isRecording ? "red" : "#694df0"}
+                                                />
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
                                 </>
                             )}
                         </View>
@@ -1796,16 +1767,16 @@ const styles = StyleSheet.create({
         borderTopColor: '#eee',
         backgroundColor: '#fff',
     },
-    input: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 20,
-        paddingHorizontal: 15,
-        paddingVertical: 8,
-        maxHeight: 100,
-        marginRight: 10,
-    },
+    // input: {
+    //     flex: 1,
+    //     borderWidth: 1,
+    //     borderColor: '#ddd',
+    //     borderRadius: 20,
+    //     paddingHorizontal: 15,
+    //     paddingVertical: 8,
+    //     maxHeight: 100,
+    //     marginRight: 10,
+    // },
     // HomeCard specific styles
     card: {
         width: '80%',

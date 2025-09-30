@@ -63,7 +63,7 @@ const CreateAssignment = () => {
             };
 
             const res = await axios.post(
-                'https://32b5245c5f10.ngrok-free.app/api/school/assignment', // adjust if needed
+                'https://37prw4st-5000.asse.devtunnels.ms/api/school/assignment', // adjust if needed
                 payload,
                 {
                     headers: {
@@ -99,6 +99,8 @@ const CreateAssignment = () => {
                         <Text style={groupStyle.label}>Title</Text>
                         <TextInput
                             placeholder="e.g. MERN Stack App"
+                            placeholderTextColor="#999"
+
                             value={formData.title}
                             onChangeText={(text) => handleChange('title', text)}
                             style={groupStyle.input}
@@ -110,6 +112,8 @@ const CreateAssignment = () => {
                         <TextInput
                             placeholder="e.g. Use AI to create MERN Stack App"
                             value={formData.description}
+                            placeholderTextColor="#999"
+
                             onChangeText={(text) => handleChange('description', text)}
                             style={[groupStyle.input, { height: 100, textAlignVertical: 'top' }]}
                             multiline

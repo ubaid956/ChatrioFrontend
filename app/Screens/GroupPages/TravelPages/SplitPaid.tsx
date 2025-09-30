@@ -18,7 +18,7 @@ const SplitPaid = () => {
       setLoading(true);
       const token = await AsyncStorage.getItem('userToken');
       const res = await axios.post(
-        `https://32b5245c5f10.ngrok-free.app/api/travel/splitexpense/${parsedData._id}/pay`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/travel/splitexpense/${parsedData._id}/pay`,
         {},
         {
           headers: {

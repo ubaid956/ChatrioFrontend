@@ -61,7 +61,7 @@ const CreateQuiz = () => {
       };
 
       const res = await axios.post(
-        'https://32b5245c5f10.ngrok-free.app/api/school/quiz',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/school/quiz',
         payload,
         {
           headers: {
@@ -97,6 +97,8 @@ const CreateQuiz = () => {
             <Text style={groupStyle.label}>Quiz Topic</Text>
             <TextInput
               placeholder="Enter quiz topic e.g. JavaScript"
+              placeholderTextColor="#999"
+
               value={formData.topic}
               onChangeText={(text) => handleChange('topic', text)}
               style={groupStyle.input}
@@ -108,6 +110,8 @@ const CreateQuiz = () => {
             <TextInput
               placeholder="Enter category e.g. Web, Science"
               value={formData.category}
+              placeholderTextColor="#999"
+
               onChangeText={(text) => handleChange('category', text)}
               style={groupStyle.input}
             />
@@ -118,6 +122,8 @@ const CreateQuiz = () => {
             <TextInput
               placeholder="Enter number e.g. 5"
               keyboardType="numeric"
+              placeholderTextColor="#999"
+
               value={formData.numberOfQuestions}
               onChangeText={(text) => handleChange('numberOfQuestions', text)}
               style={groupStyle.input}

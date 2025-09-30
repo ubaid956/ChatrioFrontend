@@ -104,6 +104,17 @@ export const globalStyles = StyleSheet.create({
         fontSize: 14,
     },
 
+    input: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        maxHeight: 100,
+        marginRight: 10,
+    },
+
 
     error: {
         fontSize: 12,
@@ -128,7 +139,7 @@ export const globalStyles = StyleSheet.create({
 
     // Login Header
     loginHeader: {
-        marginTop: height * 0.06,
+        marginTop: height * 0.02,
 
     },
 

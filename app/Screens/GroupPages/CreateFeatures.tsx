@@ -1,16 +1,19 @@
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, TextInput, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, TextInput, Platform, ActivityIndicator, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import CustomHeader from '@/app/Components/Profile_Components/CustomHeader';
 import { globalStyles } from '@/Styles/globalStyles';
 import { useLocalSearchParams, router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { DatePickerModal } from 'react-native-paper-dates';
 import CustomButton from '@/app/Components/CustomButton';
 import { groupStyle } from '@/Styles/groupStyle';
 import { useGroup } from "@/context/GroupContext";
-const { width } = Dimensions.get('window');
+
+import { Menu } from 'react-native-paper';
+
+const { width, height } = Dimensions.get('window');
 
 type FieldConfig = {
   name: string;
@@ -82,14 +85,14 @@ export default function CreateFeatures() {
   const { groupData } = useGroup();
   const { groupId, groupName, groupType } = groupData;
 
-
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
-
   const [isLoading, setIsLoading] = useState(false);
 
+  // 👇 added state for dropdown
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     const initialData: Record<string, string> = {};
@@ -127,7 +130,6 @@ export default function CreateFeatures() {
       const token = await AsyncStorage.getItem('userToken');
       const sender = await AsyncStorage.getItem('userId');
 
-
       if (!token || !sender) return alert('User not authenticated');
 
       let url = '';
@@ -135,7 +137,7 @@ export default function CreateFeatures() {
 
       switch (normalizedType) {
         case 'task':
-          url = 'https://32b5245c5f10.ngrok-free.app/api/work/task';
+          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/task';
           payload = {
             groupId,
             title: formData.title,
@@ -149,7 +151,7 @@ export default function CreateFeatures() {
           break;
 
         case 'idea':
-          url = 'https://32b5245c5f10.ngrok-free.app/api/work/idea';
+          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/idea';
           payload = {
             groupId,
             title: formData.title,
@@ -159,7 +161,7 @@ export default function CreateFeatures() {
           break;
 
         case 'note':
-          url = 'https://32b5245c5f10.ngrok-free.app/api/work/note';
+          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/note';
           payload = {
             groupId,
             title: formData.title,
@@ -181,7 +183,7 @@ export default function CreateFeatures() {
             return;
           }
 
-          url = 'https://32b5245c5f10.ngrok-free.app/api/work/poll';
+          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/poll';
           payload = {
             groupId,
             question: formData.title,
@@ -191,7 +193,7 @@ export default function CreateFeatures() {
           break;
 
         case 'meeting':
-          url = 'https://32b5245c5f10.ngrok-free.app/api/work/meeting'; // <- You must handle this in backend too
+          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/create-meeting';
           payload = {
             groupId,
             topic: formData.topic,
@@ -222,7 +224,7 @@ export default function CreateFeatures() {
       alert('Error while submitting.');
     }
     finally {
-      setIsLoading(false); // 👈 Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -233,7 +235,50 @@ export default function CreateFeatures() {
         {config.fields.map((field) => (
           <View key={field.name} style={groupStyle.inputWrapper}>
             <Text style={groupStyle.label}>{field.label}</Text>
-            {['date', 'datetime'].includes(field.type) ? (
+            {field.name === 'status' ? (
+              <View style={{ width: width * 0.9, marginBottom: 16, alignSelf: 'center' }}>
+                <Menu
+                  visible={menuVisible}
+                  onDismiss={() => setMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity
+                      onPress={() => setMenuVisible(true)}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: '#f0f0f0',
+                        borderColor: '#ccc',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        paddingHorizontal: 12,
+                        paddingVertical: 14,
+                        width: width * 0.9,
+                      }}
+                    >
+                      <Text style={{ fontSize: 16, color: formData.status ? '#000' : '#999' }}>
+                        {formData.status || 'Select Status'}
+                      </Text>
+                      <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
+                    </TouchableOpacity>
+                  }
+                  style={{
+                    width: width * 0.9, alignSelf: 'center', marginTop: height * 0.065,
+                  }}
+                >
+                  {['In Progress', 'To Do', 'Done'].map((status) => (
+                    <Menu.Item
+                      key={status}
+                      onPress={() => {
+                        handleInputChange('status', status);
+                        setMenuVisible(false);
+                      }}
+                      title={status}
+                    />
+                  ))}
+                </Menu>
+              </View>
+            ) : ['date', 'datetime'].includes(field.type) ? (
               <>
                 <TouchableOpacity
                   onPress={() => {
@@ -271,6 +316,7 @@ export default function CreateFeatures() {
                   <View key={index} style={groupStyle.optionContainer}>
                     <TextInput
                       placeholder={`Option ${index + 1}`}
+                      placeholderTextColor="#999"
                       style={[groupStyle.input, groupStyle.optionInput]}
                       value={option}
                       onChangeText={(text) => handleOptionChange(index, text)}
@@ -296,6 +342,7 @@ export default function CreateFeatures() {
             ) : field.type === 'textarea' ? (
               <TextInput
                 placeholder={field.placeholder}
+                placeholderTextColor="#999"
                 multiline
                 numberOfLines={6}
                 style={[groupStyle.input, groupStyle.textarea]}
@@ -305,6 +352,7 @@ export default function CreateFeatures() {
             ) : (
               <TextInput
                 placeholder={field.placeholder}
+                placeholderTextColor="#999"
                 style={groupStyle.input}
                 value={formData[field.name]}
                 onChangeText={(text) => handleInputChange(field.name, text)}
@@ -324,9 +372,7 @@ export default function CreateFeatures() {
           disabled={isLoading}
           large={true}
         />
-
       </ScrollView>
     </View>
   );
 }
-

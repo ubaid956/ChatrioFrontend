@@ -49,7 +49,7 @@
 //       };
 
 //       const response = await axios.post(
-//         `https://32b5245c5f10.ngrok-free.app/api/travel/location/${groupId}`,
+//         `https://37prw4st-5000.asse.devtunnels.ms/api/travel/location/${groupId}`,
 //         payload,
 //         {
 //           headers: {
@@ -236,7 +236,7 @@ const LocationSharingScreen = () => {
       };
 
       const response = await axios.post(
-        `https://32b5245c5f10.ngrok-free.app/api/travel/location/${groupId}`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/travel/location/${groupId}`,
         payload,
         {
           headers: {

@@ -22,7 +22,6 @@ import * as yup from "yup";
 import { router } from "expo-router";
 import * as WebBrowser from 'expo-web-browser'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Divider from "../Components/Divider";
 import auth from '@react-native-firebase/auth';
@@ -32,8 +31,8 @@ const { height, width } = Dimensions.get("window");
 const loginSchema = yup.object({
     phoneNumber: yup.string()
         .test('phone-length', 'Phone number too short', (value) => {
-            // Remove country code for validation
-            const numberWithoutCode = value?.replace(/^\+971/, '') || '';
+            // Remove country codes for validation (+971 UAE, +92 Pakistan)
+            const numberWithoutCode = value?.replace(/^\+(971|92)/, '') || '';
             return numberWithoutCode.length >= 9;
         })
         .required("Phone number is required")
@@ -47,7 +46,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 // const getUserProfile = async (token) => {
 //     try {
-//         const response = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/google', {
+//         const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/google', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',
@@ -81,7 +80,7 @@ WebBrowser.maybeCompleteAuthSession();
 const getUserProfile = async (token) => {
     try {
         console.log('Starting Google login process...');
-        const response = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/google', {
+        const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/google', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +129,7 @@ const getUserProfile = async (token) => {
                 if (finalStatus === 'granted') {
                     pushToken = (await Notifications.getExpoPushTokenAsync()).data;
                     // Save push token to backend
-                    await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/updatePushToken', {
+                    await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/updatePushToken', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ userId: user._id, pushToken })
@@ -216,37 +215,34 @@ const Login = () => {
             }
 
             let formattedPhone = values.phoneNumber.trim();
-            if (!formattedPhone.startsWith('+')) {
-                if (formattedPhone.startsWith('0')) {
-                    formattedPhone = formattedPhone.substring(1);
-                }
-                formattedPhone = `+92${formattedPhone}`;
+
+            // Remove + if present to match database format
+            if (formattedPhone.startsWith('+')) {
+                formattedPhone = formattedPhone.substring(1);
             }
 
-            const confirmation = await auth().signInWithPhoneNumber(formattedPhone);
+            // If starts with 0, remove it
+            if (formattedPhone.startsWith('0')) {
+                formattedPhone = formattedPhone.substring(1);
+            }
 
-            // Store confirmation in AsyncStorage for verification
-            await AsyncStorage.setItem('firebaseConfirmation', JSON.stringify({
-                verificationId: confirmation.verificationId,
-                phoneNumber: formattedPhone
-            }));
+            // If doesn't start with country code, add default UAE code
+            if (!formattedPhone.startsWith('971') && !formattedPhone.startsWith('92')) {
+                formattedPhone = `971${formattedPhone}`;
+            }
 
+            // Navigate directly to Login_2 for password authentication
+            console.log('Formatted phone for login:', formattedPhone);
             router.push({
-                pathname: "/Screens/Verification",
+                pathname: "/Screens/Login_2",
                 params: {
                     phoneNumber: formattedPhone,
                     next: 'login',
                 },
             });
         } catch (err) {
-            console.log('OTP send error:', err);
-            let errorMessage = 'Failed to send OTP. Please check the phone number.';
-            if (err.code === 'auth/invalid-phone-number') {
-                errorMessage = 'Invalid phone number format';
-            } else if (err.code === 'auth/too-many-requests') {
-                errorMessage = 'Too many requests. Please try again later.';
-            }
-            Alert.alert('Error', errorMessage);
+            console.log('Navigation error:', err);
+            Alert.alert('Error', 'Something went wrong. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -305,10 +301,6 @@ const Login = () => {
                                 </View>
                             )}
                         </Formik>
-
-
-
-
                     </View>
                 </TouchableWithoutFeedback>
 

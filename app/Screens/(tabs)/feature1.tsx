@@ -68,7 +68,7 @@ const Feature1 = () => {
             }
 
             const response = await axios.get(
-                `https://32b5245c5f10.ngrok-free.app/api/work/task/${groupData.groupId}`,
+                `https://37prw4st-5000.asse.devtunnels.ms/api/work/task/${groupData.groupId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -90,7 +90,7 @@ const Feature1 = () => {
             setLoading(true);
             const token = await AsyncStorage.getItem('userToken');
             const res = await axios.get(
-                `https://32b5245c5f10.ngrok-free.app/api/school/events/${groupData.groupId}`,
+                `https://37prw4st-5000.asse.devtunnels.ms/api/school/events/${groupData.groupId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -117,7 +117,7 @@ const Feature1 = () => {
             }
 
             const res = await axios.get(
-                `https://32b5245c5f10.ngrok-free.app/api/home/shopping/${groupData.groupId}`,
+                `https://37prw4st-5000.asse.devtunnels.ms/api/home/shopping/${groupData.groupId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -137,7 +137,7 @@ const Feature1 = () => {
             setItineraryLoading(true);
             const token = await AsyncStorage.getItem('userToken');
             const res = await axios.get(
-                `https://32b5245c5f10.ngrok-free.app/api/travel/itinerary/${groupData.groupId}`,
+                `https://37prw4st-5000.asse.devtunnels.ms/api/travel/itinerary/${groupData.groupId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

@@ -51,7 +51,7 @@ const CreateBudget = () => {
       };
 
       const response = await axios.post(
-        'https://32b5245c5f10.ngrok-free.app/api/home/addbudget',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/home/addbudget',
         payload,
         {
           headers: {
@@ -83,6 +83,8 @@ const CreateBudget = () => {
           <Text style={groupStyle.label}>Title</Text>
           <TextInput
             placeholder="Enter Budget Title"
+            placeholderTextColor="#999"
+
             value={formData.title}
             onChangeText={(text) => handleChange('title', text)}
             style={groupStyle.input}
@@ -93,6 +95,8 @@ const CreateBudget = () => {
           <Text style={groupStyle.label}>Amount</Text>
           <TextInput
             placeholder="Enter Amount"
+            placeholderTextColor="#999"
+
             keyboardType="numeric"
             value={formData.amount}
             onChangeText={(text) => handleChange('amount', text)}
@@ -178,6 +182,8 @@ const CreateBudget = () => {
           <Text style={groupStyle.label}>Category</Text>
           <TextInput
             placeholder="Enter Category e.g. Rent, Food"
+            placeholderTextColor="#999"
+
             value={formData.category}
             onChangeText={(text) => handleChange('category', text)}
             style={groupStyle.input}

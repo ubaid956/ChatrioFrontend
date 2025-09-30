@@ -13,10 +13,13 @@ import { Feather } from '@expo/vector-icons';
 import { globalStyles } from '@/Styles/globalStyles';
 import CustomHeader from '@/app/Components/Profile_Components/CustomHeader';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 const { height, width } = Dimensions.get('window');
 
 const TermsAndPrivacy = ({ navigation }) => {
+  const { t } = useTranslation();
+
   const handleBack = () => {
     navigation.goBack();
   };
@@ -29,7 +32,7 @@ const TermsAndPrivacy = ({ navigation }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 
       <CustomHeader
-        title="Terms & Privacy Policy"
+        title={t('termsPrivacy.title')}
         onBackPress={() => router.back()}
       />
       <ScrollView
@@ -42,105 +45,105 @@ const TermsAndPrivacy = ({ navigation }) => {
         {/* Content */}
         <View style={styles.content}>
           {/* Introduction */}
-          <Text style={styles.lastUpdated}>Last Updated: June 2024</Text>
+          <Text style={styles.lastUpdated}>{t('termsPrivacy.lastUpdated')}</Text>
 
-          <Text style={styles.sectionTitle}>1. Introduction</Text>
+          <Text style={styles.sectionTitle}>{t('termsPrivacy.introduction')}</Text>
           <Text style={styles.sectionText}>
-            Welcome to Chatrio! This Terms & Privacy Policy outlines how we handle your data, your rights, and the rules governing your use of our chat application. By using Chatrio, you agree to these terms.
+            {t('termsPrivacy.introText')}
           </Text>
 
           {/* Data Collection */}
-          <Text style={styles.sectionTitle}>2. Data Collection & Usage</Text>
-          <Text style={styles.subSectionTitle}>What We Collect:</Text>
+          <Text style={styles.sectionTitle}>{t('termsPrivacy.dataCollection')}</Text>
+          <Text style={styles.subSectionTitle}>{t('termsPrivacy.whatWeCollect')}</Text>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>Account Information:</Text> Name, email, phone number (optional), profile picture.
+              <Text style={styles.boldText}>{t('termsPrivacy.accountInfo')}</Text> {t('termsPrivacy.accountInfoDesc')}
             </Text>
           </View>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>Messages & Media:</Text> Text, images, videos, and files shared in chats.
+              <Text style={styles.boldText}>{t('termsPrivacy.messagesMedia')}</Text> {t('termsPrivacy.messagesMediaDesc')}
             </Text>
           </View>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>Device Information:</Text> IP address, device type, OS version for security and analytics.
+              <Text style={styles.boldText}>{t('termsPrivacy.deviceInfo')}</Text> {t('termsPrivacy.deviceInfoDesc')}
             </Text>
           </View>
 
-          <Text style={styles.subSectionTitle}>How We Use Your Data:</Text>
+          <Text style={styles.subSectionTitle}>{t('termsPrivacy.howWeUse')}</Text>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
-            <Text style={styles.sectionText}>To provide and improve our services.</Text>
+            <Text style={styles.sectionText}>{t('termsPrivacy.provideServices')}</Text>
           </View>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
-            <Text style={styles.sectionText}>For authentication and account security.</Text>
+            <Text style={styles.sectionText}>{t('termsPrivacy.authentication')}</Text>
           </View>
 
           {/* Data Security */}
-          <Text style={styles.sectionTitle}>3. Data Storage & Security</Text>
+          <Text style={styles.sectionTitle}>{t('termsPrivacy.dataSecurity')}</Text>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>Messages:</Text> Stored securely in encrypted databases.
+              <Text style={styles.boldText}>{t('termsPrivacy.messages')}</Text> {t('termsPrivacy.messagesDesc')}
             </Text>
           </View>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>End-to-End Encryption:</Text> Private chats are encrypted, but group chats may not be fully E2EE.
+              <Text style={styles.boldText}>{t('termsPrivacy.encryption')}</Text> {t('termsPrivacy.encryptionDesc')}
             </Text>
           </View>
 
           {/* User Rights */}
-          <Text style={styles.sectionTitle}>4. User Rights & Controls</Text>
+          <Text style={styles.sectionTitle}>{t('termsPrivacy.userRights')}</Text>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>Access & Correction:</Text> You can view and edit your profile data anytime.
+              <Text style={styles.boldText}>{t('termsPrivacy.accessCorrection')}</Text> {t('termsPrivacy.accessCorrectionDesc')}
             </Text>
           </View>
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.sectionText}>
-              <Text style={styles.boldText}>Deletion:</Text> You can delete your account, which removes your personal data.
+              <Text style={styles.boldText}>{t('termsPrivacy.deletion')}</Text> {t('termsPrivacy.deletionDesc')}
             </Text>
           </View>
 
           {/* Prohibited Activities */}
-          <Text style={styles.sectionTitle}>5. Prohibited Activities</Text>
+          <Text style={styles.sectionTitle}>{t('termsPrivacy.prohibited')}</Text>
           <Text style={styles.sectionText}>
-            You agree not to use Chatrio for:
+            {t('termsPrivacy.prohibitedText')}
           </Text>
           <View style={styles.bulletPoint}>
             <Text style={[styles.bullet, styles.prohibited]}>❌</Text>
             <Text style={[styles.sectionText, styles.prohibitedText]}>
-              Harassment, hate speech, or illegal content.
+              {t('termsPrivacy.harassment')}
             </Text>
           </View>
           <View style={styles.bulletPoint}>
             <Text style={[styles.bullet, styles.prohibited]}>❌</Text>
             <Text style={[styles.sectionText, styles.prohibitedText]}>
-              Spamming or phishing attempts.
+              {t('termsPrivacy.spamming')}
             </Text>
           </View>
 
           {/* Contact */}
-          <Text style={styles.sectionTitle}>8. Contact Us</Text>
+          <Text style={styles.sectionTitle}>{t('termsPrivacy.contact')}</Text>
           <Text style={styles.sectionText}>
-            For questions or data requests:
+            {t('termsPrivacy.contactText')}
           </Text>
           <TouchableOpacity onPress={openEmail}>
-            <Text style={styles.emailText}>📧 support@chatrio.com</Text>
+            <Text style={styles.emailText}>{t('termsPrivacy.email')}</Text>
           </TouchableOpacity>
 
           {/* Acceptance */}
           <Text style={styles.acceptanceText}>
-            By using Chatrio, you confirm that you have read and agree to these terms.
+            {t('termsPrivacy.acceptance')}
           </Text>
         </View>
       </ScrollView>

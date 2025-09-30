@@ -8,33 +8,36 @@ import ar from './locales/ar/translation.json';
 
 const DEFAULT_LANG = 'en';
 
-// Function to load saved language
-const loadLanguage = async () => {
-  try {
-    const storedLang = await AsyncStorage.getItem('appLanguage');
-    return storedLang || DEFAULT_LANG;
-  } catch {
-    return DEFAULT_LANG;
-  }
+// Synchronous init with default language
+i18n
+  .use(initReactI18next)
+  .init({
+    compatibilityJSON: 'v3',
+    lng: DEFAULT_LANG,
+    fallbackLng: DEFAULT_LANG,
+    resources: {
+      en: { translation: en },
+      ar: { translation: ar },
+    },
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+
+// Utility to set language and persist
+export const setAppLanguage = async (lang) => {
+  await i18n.changeLanguage(lang);
+  await AsyncStorage.setItem('appLanguage', lang);
 };
 
-(async () => {
-  const savedLang = await loadLanguage();
-
-  i18n
-    .use(initReactI18next)
-    .init({
-      compatibilityJSON: 'v3',
-      lng: savedLang,
-      fallbackLng: DEFAULT_LANG,
-      resources: {
-        en: { translation: en },
-        ar: { translation: ar },
-      },
-      interpolation: {
-        escapeValue: false,
-      },
-    });
-})();
+// Utility to load language from storage and switch if needed
+export const loadLanguage = async () => {
+  try {
+    const storedLang = await AsyncStorage.getItem('appLanguage');
+    if (storedLang && storedLang !== DEFAULT_LANG) {
+      await i18n.changeLanguage(storedLang);
+    }
+  } catch { }
+};
 
 export default i18n;

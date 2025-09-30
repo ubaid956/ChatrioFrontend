@@ -63,7 +63,7 @@ const feature3 = () => {
         return;
       }
       const response = await axios.get(
-        `https://32b5245c5f10.ngrok-free.app/api/home/budget/${groupData.groupId}`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/home/budget/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -87,7 +87,7 @@ const feature3 = () => {
         return;
       }
 
-      const response = await axios.get(`https://32b5245c5f10.ngrok-free.app/api/work/idea/${groupData.groupId}`, {
+      const response = await axios.get(`https://37prw4st-5000.asse.devtunnels.ms/api/work/idea/${groupData.groupId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -112,7 +112,7 @@ const feature3 = () => {
       }
 
       const response = await axios.get(
-        `https://32b5245c5f10.ngrok-free.app/api/school/quiz/${groupData.groupId}`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/school/quiz/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -139,7 +139,7 @@ const feature3 = () => {
       }
 
       const response = await axios.get(
-        `https://32b5245c5f10.ngrok-free.app/api/travel/splitexpense/${groupData.groupId}`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/travel/splitexpense/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

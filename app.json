@@ -24,15 +24,22 @@
     },
     "android": {
       "package": "com.uaesoft.chatrio2",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/chatrio_logo_trans.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "googleServicesFile": "./google-services.json",
-      "notification": {
-        "icon": "./assets/images/chatrio_logo_trans.png"
-      }
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.USE_FULL_SCREEN_INTENT"
+      ],
+      "useNextNotificationsApi": true,
+      "allowBackup": false
     },
     "web": {
       "bundler": "metro",

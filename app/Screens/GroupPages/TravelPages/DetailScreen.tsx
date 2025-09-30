@@ -170,7 +170,7 @@ const DetailScreen = () => {
       }
 
       await axios.put(
-        `https://32b5245c5f10.ngrok-free.app/api/travel/${checklistId}/${itemId}/toggle`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/travel/${checklistId}/${itemId}/toggle`,
         {},
         {
           headers: {

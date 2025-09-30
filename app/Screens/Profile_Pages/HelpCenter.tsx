@@ -9,19 +9,23 @@ import {
 } from 'react-native';
 import { globalStyles } from '@/Styles/globalStyles';
 import { MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import CustomHeader from '@/app/Components/Profile_Components/CustomHeader'
 import Profile_cart from '@/app/Components/Profile_cart';
 
 const { height, width } = Dimensions.get('window')
 const HelpCenter = () => {
+    const { t } = useTranslation();
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <ScrollView>
 
 
                 <CustomHeader
-                    title="Help Center"
+                    title={t('helpCenter.title')}
                     onBackPress={() => router.back()}
                 />
                 <Image
@@ -32,31 +36,31 @@ const HelpCenter = () => {
 
 
                 <Text style={{ fontSize: "25", fontWeight: 'bold', textAlign: 'center', marginBottom: height * 0.03 }}>
-                    How can we Help ?
+                    {t('helpCenter.subtitle')}
                 </Text>
 
                 <Text style={{ marginLeft: width * 0.06, fontSize: "18" }}>
-                    Helo Topics
+                    {t('helpCenter.helpTopics')}
                 </Text>
 
                 <View style={{ backgroundColor: '#f4f4f4' }}>
                     <Profile_cart
                         iconComponent={MaterialIcons}
-                        text="Get Started"
+                        text={t('helpCenter.getStarted')}
                         iconName="flag" />
 
                     <Profile_cart
                         iconComponent={MaterialIcons}
-                        text="Chats"
+                        text={t('helpCenter.chats')}
                         iconName="message" />
                     <Profile_cart
                         iconComponent={MaterialIcons}
-                        text="Voice and Video Calls"
+                        text={t('helpCenter.voiceVideoCalls')}
                         iconName="phone" />
 
                     <Profile_cart
                         iconComponent={MaterialIcons}
-                        text="Accounts and Account Bans"
+                        text={t('helpCenter.accountsBans')}
                         iconName="man" />
                 </View>
             </ScrollView>

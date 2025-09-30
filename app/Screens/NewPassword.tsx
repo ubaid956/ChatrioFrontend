@@ -31,7 +31,7 @@ const NewPassword = () => {
   const handleReset = async (values, { resetForm }) => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/users/updatePassword', {
+      const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/updatePassword', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

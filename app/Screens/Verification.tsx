@@ -16,7 +16,7 @@
 //   const handleVerify = async () => {
 //     setIsLoading(true);
 //     try {
-//       const response = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/users/verifyOtp', {
+//       const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/verifyOtp', {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ OTP: otp }), // ✅ Use "OTP" (uppercase)
@@ -143,11 +143,11 @@ const Verification = () => {
       await AsyncStorage.removeItem('firebaseConfirmation');
 
       if (next === 'login') {
-        const resp = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/login', {
+        const resp = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            phone: phoneNumber.replace('+', ''), // Remove + for database storage
+            phone: phoneNumber,// Remove + for database storage
             firebaseToken: idToken
           })
         });
@@ -185,7 +185,7 @@ const Verification = () => {
             if (finalStatus === 'granted') {
               pushToken = (await Notifications.getExpoPushTokenAsync()).data;
               // Save push token to backend
-              await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/updatePushToken', {
+              await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/updatePushToken', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: payload._id, pushToken })
@@ -202,7 +202,7 @@ const Verification = () => {
       }
 
       if (next === 'signup') {
-        const resp = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/register', {
+        const resp = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -244,7 +244,7 @@ const Verification = () => {
   };
 
   return (
-    <View>
+    <View style={{ backgroundColor: '#fff' }}>
       <LoginHeader
         title="Verification"
         subtitle={`Enter the code sent to ${phoneNumber}`}

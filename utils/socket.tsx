@@ -1,7 +1,7 @@
 // socket.js
 import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = "https://32b5245c5f10.ngrok-free.app";
+const SOCKET_URL = "https://37prw4st-5000.asse.devtunnels.ms";
 
 let socket: Socket | undefined;
 

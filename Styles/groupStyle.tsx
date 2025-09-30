@@ -91,34 +91,34 @@ export const groupStyle = StyleSheet.create({
     elevation: 3,
     marginVertical: 4,
     paddingBottom: height * 0.04, // Adjusted for better spacing
-    
+
   },
-cardContent: {
+  cardContent: {
     flex: 1,
   },
   cardTitle: {
     fontWeight: '700',
     fontSize: 16,
     color: '#111',
-   
-   
+
+
   },
   cardRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: height * 0.01,
-   
-    
-   
+
+
+
   },
   cardText: {
-   
+    marginHorizontal: width * 0.01,
     color: '#555',
     fontSize: 13,
   },
   sentCard: {
     backgroundColor: '#694df0',
-    marginRight: width*0.01,
+    marginRight: width * 0.01,
   },
   receivedCard: {
     backgroundColor: '#e4e6eb',

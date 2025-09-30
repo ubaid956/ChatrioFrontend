@@ -38,7 +38,7 @@ const Chats = () => {
           setCurrentUser(userData);
         }
 
-        const response = await axios.get('https://32b5245c5f10.ngrok-free.app/api/auth/users', {
+        const response = await axios.get('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -77,7 +77,7 @@ const Chats = () => {
             setCurrentUser(userData);
           }
 
-          const response = await axios.get('https://32b5245c5f10.ngrok-free.app/api/auth/users', {
+          const response = await axios.get('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users', {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (!isActive) return;

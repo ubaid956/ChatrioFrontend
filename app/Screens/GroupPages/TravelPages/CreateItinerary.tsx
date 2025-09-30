@@ -61,7 +61,7 @@ const CreateItinerary = () => {
             };
 
             const response = await axios.post(
-                'https://32b5245c5f10.ngrok-free.app/api/travel/itinerary',
+                'https://37prw4st-5000.asse.devtunnels.ms/api/travel/itinerary',
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -88,11 +88,13 @@ const CreateItinerary = () => {
                 {/* Title & Description */}
                 <View style={groupStyle.inputWrapper}>
                     <Text style={groupStyle.label}>Title</Text>
-                    <TextInput placeholder="Title" style={groupStyle.input} value={formData.title} onChangeText={(t) => handleChange('title', t)} />
+                    <TextInput placeholder="Title" placeholderTextColor="#999"
+                        style={groupStyle.input} value={formData.title} onChangeText={(t) => handleChange('title', t)} />
                 </View>
                 <View style={groupStyle.inputWrapper}>
                     <Text style={groupStyle.label}>Description</Text>
-                    <TextInput placeholder="Description" multiline style={[groupStyle.input, { height: height * 0.09 }]} value={formData.description} onChangeText={(t) => handleChange('description', t)} />
+                    <TextInput placeholder="Description" placeholderTextColor="#999"
+                        multiline style={[groupStyle.input, { height: height * 0.09 }]} value={formData.description} onChangeText={(t) => handleChange('description', t)} />
                 </View>
                 {/* Start Date */}
                 <View style={groupStyle.inputWrapper}>
@@ -124,9 +126,12 @@ const CreateItinerary = () => {
                     {destinations.map((dest, idx) => (
 
                         <View key={idx}>
-                            <TextInput placeholder="City Name" value={dest.name} onChangeText={(t) => updateNestedField(idx, 'name', t, setDestinations, destinations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
-                            <TextInput placeholder="Date (YYYY-MM-DD)" value={dest.date} onChangeText={(t) => updateNestedField(idx, 'date', t, setDestinations, destinations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
-                            <TextInput placeholder="Activities (comma separated)" value={dest.activities.join(', ')} onChangeText={(t) => updateNestedField(idx, 'activities', t.split(','), setDestinations, destinations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
+                            <TextInput placeholder="City Name" placeholderTextColor="#999"
+                                value={dest.name} onChangeText={(t) => updateNestedField(idx, 'name', t, setDestinations, destinations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
+                            <TextInput placeholder="Date (YYYY-MM-DD)" placeholderTextColor="#999"
+                                value={dest.date} onChangeText={(t) => updateNestedField(idx, 'date', t, setDestinations, destinations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
+                            <TextInput placeholder="Activities (comma separated)" placeholderTextColor="#999"
+                                value={dest.activities.join(', ')} onChangeText={(t) => updateNestedField(idx, 'activities', t.split(','), setDestinations, destinations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
                         </View>
                     ))}
                     <TouchableOpacity onPress={() => setDestinations([...destinations, { name: '', date: '', activities: [''] }])}><Text>Add Destination</Text></TouchableOpacity>
@@ -139,7 +144,8 @@ const CreateItinerary = () => {
                     {transportation.map((tran, idx) => (
                         <View key={idx}>
                             {['mode', 'company', 'from', 'to', 'departureTime', 'arrivalTime'].map((f) => (
-                                <TextInput key={f} placeholder={f} value={tran[f]} onChangeText={(t) => updateNestedField(idx, f, t, setTransportation, transportation)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
+                                <TextInput key={f} placeholderTextColor="#999"
+                                    placeholder={f} value={tran[f]} onChangeText={(t) => updateNestedField(idx, f, t, setTransportation, transportation)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
                             ))}
                         </View>
                     ))}
@@ -152,7 +158,8 @@ const CreateItinerary = () => {
                     {accommodations.map((acc, idx) => (
                         <View key={idx}>
                             {['name', 'address', 'checkIn', 'checkOut', 'bookingRef'].map((f) => (
-                                <TextInput key={f} placeholder={f} value={acc[f]} onChangeText={(t) => updateNestedField(idx, f, t, setAccommodations, accommodations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
+                                <TextInput key={f} placeholderTextColor="#999"
+                                     placeholder={f} value={acc[f]} onChangeText={(t) => updateNestedField(idx, f, t, setAccommodations, accommodations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
                             ))}
                         </View>
                     ))}

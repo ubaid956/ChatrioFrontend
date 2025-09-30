@@ -36,7 +36,7 @@ const Groups = () => {
         setCurrentUser(userData);
       }
 
-      const res = await axios.get('https://32b5245c5f10.ngrok-free.app/api/groups', {
+      const res = await axios.get('https://37prw4st-5000.asse.devtunnels.ms/api/groups', {
         headers: {
           Authorization: `Bearer ${token}`
         }

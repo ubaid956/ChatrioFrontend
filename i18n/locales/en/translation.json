@@ -7,7 +7,6 @@
   "phone_number": "Phone Number",
   "phone_too_short": "Phone number too short",
   "phone_required": "Phone number is required",
-
   "create_account": "Create Account",
   "full_name": "Full Name",
   "email": "Email",
@@ -32,20 +31,16 @@
   "error": "Error",
   "account_creation_failed": "Failed to create account",
   "something_went_wrong": "Something went wrong. Please try again.",
-
   // Chat Page
-
   "home": "Home",
   "app_name": "Chatrio",
   "recent_conversations": "Recent Conversations",
   "no_recent_chats": "No recent chats",
-
   "tabs": {
     "chats": "Chats",
     "groups": "Groups",
     "profile": "Profile"
   },
-
   "greeting": "Good Morning, {{name}}",
   "readyMessage": "Ready to make today productive?",
   "categories": {
@@ -58,8 +53,6 @@
   "todayHighlights": "Today Highlights",
   "noGroups": "No groups available",
   "members": "members",
-
-
   "profile": {
     "noUserData": "No user data found. Please login again.",
     "accountInformation": "ACCOUNT INFORMATION",
@@ -68,6 +61,9 @@
     "savedItems": "Saved Items",
     "reviews": "Review & Ratings",
     "settingsSupport": "SETTINGS & SUPPORT",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "cancel": "Cancel",
     "accountSettings": "Account Settings",
     "helpCenter": "Help Center",
     "termsPrivacy": "Terms & Privacy",
@@ -80,8 +76,77 @@
     "errorProfilePic": "Failed to upload profile picture",
     "errorLogout": "Logout Error"
   },
-
-  
+  "helpCenter": {
+    "title": "Help Center",
+    "subtitle": "How can we Help ?",
+    "helpTopics": "Help Topics",
+    "getStarted": "Get Started",
+    "chats": "Chats",
+    "voiceVideoCalls": "Voice and Video Calls",
+    "accountsBans": "Accounts and Account Bans"
+  },
+  "termsPrivacy": {
+    "title": "Terms & Privacy Policy",
+    "lastUpdated": "Last Updated: June 2024",
+    "introduction": "1. Introduction",
+    "introText": "Welcome to Chatrio! This Terms & Privacy Policy outlines how we handle your data, your rights, and the rules governing your use of our chat application. By using Chatrio, you agree to these terms.",
+    "dataCollection": "2. Data Collection & Usage",
+    "whatWeCollect": "What We Collect:",
+    "accountInfo": "Account Information:",
+    "accountInfoDesc": "Name, email, phone number (optional), profile picture.",
+    "messagesMedia": "Messages & Media:",
+    "messagesMediaDesc": "Text, images, videos, and files shared in chats.",
+    "deviceInfo": "Device Information:",
+    "deviceInfoDesc": "IP address, device type, OS version for security and analytics.",
+    "howWeUse": "How We Use Your Data:",
+    "provideServices": "To provide and improve our services.",
+    "authentication": "For authentication and account security.",
+    "dataSecurity": "3. Data Storage & Security",
+    "messages": "Messages:",
+    "messagesDesc": "Stored securely in encrypted databases.",
+    "encryption": "End-to-End Encryption:",
+    "encryptionDesc": "Private chats are encrypted, but group chats may not be fully E2EE.",
+    "userRights": "4. User Rights & Controls",
+    "accessCorrection": "Access & Correction:",
+    "accessCorrectionDesc": "You can view and edit your profile data anytime.",
+    "deletion": "Deletion:",
+    "deletionDesc": "You can delete your account, which removes your personal data.",
+    "prohibited": "5. Prohibited Activities",
+    "prohibitedText": "You agree not to use Chatrio for:",
+    "harassment": "Harassment, hate speech, or illegal content.",
+    "spamming": "Spamming or phishing attempts.",
+    "contact": "8. Contact Us",
+    "contactText": "For questions or data requests:",
+    "email": "📧 support@chatrio.com",
+    "acceptance": "By using Chatrio, you confirm that you have read and agree to these terms."
+  },
+  "about": {
+    "title": "About",
+    "currentlySet": "Currently set to",
+    "notSet": "Not set",
+    "selectAbout": "Select About",
+    "addAbout": "Add About",
+    "customStatusPlaceholder": "Type your custom status",
+    "cancel": "Cancel",
+    "save": "Save",
+    "addCustomAbout": "Add Custom About",
+    "saveAbout": "Save About",
+    "available": "Available",
+    "busy": "Busy",
+    "atSchool": "At school",
+    "atMovies": "At the movies",
+    "atWork": "At work",
+    "batteryDying": "Battery about to die",
+    "whatsappOnly": "Can't talk, WhatsApp only",
+    "inMeeting": "In a meeting",
+    "atGym": "At the gym",
+    "sleeping": "Sleeping",
+    "urgentOnly": "Urgent calls only",
+    "success": "Success",
+    "aboutUpdated": "About status updated!",
+    "error": "Error",
+    "updateFailed": "Failed to update about status"
+  },
   "welcome": "Welcome",
   "adaptive_platform": "An Adaptive Communication Platform",
   "smart_ui": "🤖 Smart UI – Adapts to your mood, time, and routine.",

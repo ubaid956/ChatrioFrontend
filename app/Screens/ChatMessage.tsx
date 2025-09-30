@@ -23,6 +23,7 @@ import MessageHeader from '../Components/MessageHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { connectSocket, getSocket } from '@/utils/socket';
+import { globalStyles } from '@/Styles/globalStyles';
 
 const { height } = Dimensions.get('window');
 
@@ -68,7 +69,7 @@ const ChatMessage = () => {
         console.error('No token found');
         return;
       }
-      const response = await axios.get(`https://32b5245c5f10.ngrok-free.app/api/auth/users/${userId}`, {
+      const response = await axios.get(`https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const user = response.data.data.user;
@@ -106,6 +107,11 @@ const ChatMessage = () => {
         return null;
       }).filter(Boolean);
       setMessages(formattedMessages);
+
+      // Auto-scroll to bottom when messages are loaded
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     } catch (error) {
       console.error('Error fetching chat data:', error);
     } finally {
@@ -137,7 +143,7 @@ const ChatMessage = () => {
           const token = await AsyncStorage.getItem('userToken');
           if (!token) return;
 
-          const response = await axios.get(`https://32b5245c5f10.ngrok-free.app/api/auth/users/${userId}`, {
+          const response = await axios.get(`https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -179,10 +185,10 @@ const ChatMessage = () => {
 
             setMessages(formattedMessages);
 
-            // Scroll to bottom after refresh
+            // Scroll to bottom after refresh with slightly longer delay for better performance
             setTimeout(() => {
               flatListRef.current?.scrollToEnd({ animated: true });
-            }, 100);
+            }, 150);
           }
         } catch (error) {
           console.log('Chat refresh failed:', error);
@@ -198,89 +204,14 @@ const ChatMessage = () => {
     React.useCallback(() => {
       console.log('Chat screen focused, refreshing messages');
       setRefreshTrigger(prev => prev + 1);
+
+      // Auto-scroll to bottom when screen gains focus
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 200);
     }, [])
   );
 
-  // Realtime: receive private messages instantly while this chat is open
-  // useEffect(() => {
-  //   let isActive = true;
-  //   const initSocket = async () => {
-  //     try {
-  //       const myId = await AsyncStorage.getItem('userId');
-  //       const token = await AsyncStorage.getItem('userToken');
-  //       if (!myId || !token) return;
-  //       const socket = connectSocket(token);
-
-  //       // Add connection debugging
-  //       socket.on('connect', () => {
-  //         console.log('Socket connected for chat:', myId);
-  //       });
-
-  //       socket.on('disconnect', () => {
-  //         console.log('Socket disconnected for chat');
-  //       });
-
-  //       socket.off('privateMessage');
-  //       socket.on('privateMessage', (msg) => {
-  //         console.log('Received privateMessage in chat:', msg);
-  //         if (!isActive) return;
-  //         // Only handle messages relevant to this open chat: from the other user to me
-  //         const senderId = msg.sender?._id || msg.sender;
-  //         const recipientId = msg.recipient?._id || msg.recipient;
-  //         console.log('Checking message relevance:', { senderId, recipientId, userId, myId });
-  //         if (String(senderId) !== String(userId) || String(recipientId) !== String(myId)) return;
-
-  //         const messageTime = new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  //         const uniqueId = msg._id || `${Date.now()}-${Math.random()}`;
-
-  //         if (msg.audio && msg.audio.url) {
-  //           setMessages(prev => [
-  //             ...prev,
-  //             {
-  //               id: uniqueId,
-  //               audio: {
-  //                 url: msg.audio.url,
-  //                 duration: msg.audio.duration || null,
-  //                 mimeType: msg.audio.mimeType || 'audio/mpeg',
-  //               },
-  //               type: 'received',
-  //               time: messageTime,
-  //               duration: msg.audio.duration ? `${Math.floor(msg.audio.duration)}s` : '0s'
-  //             }
-  //           ]);
-  //         } else if (msg.text && msg.text.trim() !== '') {
-  //           setMessages(prev => [
-  //             ...prev,
-  //             {
-  //               id: uniqueId,
-  //               text: msg.text,
-  //               type: 'received',
-  //               time: messageTime,
-  //             }
-  //           ]);
-  //         }
-
-  //         // Keep view scrolled to bottom
-  //         setTimeout(() => {
-  //           flatListRef.current?.scrollToEnd({ animated: true });
-  //         }, 50);
-  //       });
-  //     } catch (e) {
-  //       console.warn('Socket init error (chat):', e);
-  //     }
-  //   };
-  //   initSocket();
-
-  //   return () => {
-  //     isActive = false;
-  //     try {
-  //       const socket = getSocket();
-  //       socket?.off('privateMessage');
-  //     } catch { }
-  //   };
-  // }, [userId]);
-
-  // Realtime: receive private messages instantly while this chat is open
   useEffect(() => {
     let isActive = true;
     const initSocket = async () => {
@@ -392,7 +323,7 @@ const ChatMessage = () => {
         formData.append('recipientId', userId);
 
         const response = await axios.post(
-          'https://32b5245c5f10.ngrok-free.app/api/messages/private',
+          'https://37prw4st-5000.asse.devtunnels.ms/api/messages/private',
           formData,
           {
             headers: {
@@ -447,7 +378,7 @@ const ChatMessage = () => {
 
         // Send via HTTP as fallback or primary
         const response = await axios.post(
-          'https://32b5245c5f10.ngrok-free.app/api/messages/private',
+          'https://37prw4st-5000.asse.devtunnels.ms/api/messages/private',
           {
             recipientId: userId,
             text: input,
@@ -629,8 +560,9 @@ const ChatMessage = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 35 : 30}
       >
+
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1 }}>
             <MessageHeader
@@ -650,6 +582,18 @@ const ChatMessage = () => {
               contentContainerStyle={styles.chatContainer}
               onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
               showsVerticalScrollIndicator={false}
+              scrollEnabled={true}
+              bounces={true}
+              alwaysBounceVertical={true}
+              keyboardShouldPersistTaps="handled"
+              maintainVisibleContentPosition={{
+                minIndexForVisible: 0,
+                autoscrollToTopThreshold: 10
+              }}
+              removeClippedSubviews={false}
+              maxToRenderPerBatch={50}
+              windowSize={10}
+              initialNumToRender={20}
             />
 
             <View style={styles.inputContainer}>
@@ -674,7 +618,7 @@ const ChatMessage = () => {
                   </View>
 
                   <Text style={styles.recordingDuration}>
-                    {Math.round(recordingDuration)}s
+                    {Math.round(recordingDuration)}
                   </Text>
 
                   <TouchableOpacity
@@ -686,30 +630,45 @@ const ChatMessage = () => {
                 </View>
               ) : (
                 <>
-                  <TextInput
-                    placeholder="Message..."
-                    ref={inputRef}
-                    style={styles.input}
-                    value={input}
-                    onChangeText={setInput}
-                    multiline
-                    onFocus={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                  />
-
-                  <TouchableOpacity
-                    onPress={() => input.trim() ? handleSendMessage() : startRecording()}
-                    onLongPress={startRecording}
+                  <View
+                    style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingBottom: height * 0.01 }}
                   >
-                    {input.trim() ? (
-                      <Ionicons name="send" size={28} color="#694df0" />
-                    ) : (
-                      <Ionicons
-                        name={isRecording ? "mic-off" : "mic"}
-                        size={28}
-                        color={isRecording ? "red" : "#694df0"}
-                      />
-                    )}
-                  </TouchableOpacity>
+
+                    <TextInput
+                      placeholder="Message..."
+                      placeholderTextColor="#999"
+                      ref={inputRef}
+                      style={[globalStyles.input]}
+                      value={input}
+                      onChangeText={setInput}
+                      multiline
+                      onFocus={() => {
+                        // Scroll to bottom when input is focused - multiple attempts for reliability
+                        setTimeout(() => {
+                          flatListRef.current?.scrollToEnd({ animated: true });
+                        }, 50);
+                        // Additional scroll after keyboard animation
+                        setTimeout(() => {
+                          flatListRef.current?.scrollToEnd({ animated: true });
+                        }, 300);
+                      }}
+                    />
+
+                    <TouchableOpacity
+                      onPress={() => input.trim() ? handleSendMessage() : startRecording()}
+                      onLongPress={startRecording}
+                    >
+                      {input.trim() ? (
+                        <Ionicons name="send" size={28} color="#694df0" />
+                      ) : (
+                        <Ionicons
+                          name={isRecording ? "mic-off" : "mic"}
+                          size={28}
+                          color={isRecording ? "red" : "#694df0"}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 </>
               )}
             </View>
@@ -728,6 +687,7 @@ const styles = StyleSheet.create({
   chatContainer: {
     padding: 10,
     paddingBottom: 10,
+    flexGrow: 1,
   },
   messageContainer: {
     maxWidth: '75%',

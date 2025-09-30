@@ -54,7 +54,7 @@ const CreateChecklist = () => {
       };
 
       const response = await axios.post(
-        'https://32b5245c5f10.ngrok-free.app/api/travel/checklist',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/travel/checklist',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -82,6 +82,8 @@ const CreateChecklist = () => {
         <View style={groupStyle.inputWrapper}>
           <Text style={groupStyle.label}>Destination</Text>
           <TextInput
+            placeholderTextColor="#999"
+
             placeholder="Destination"
             style={groupStyle.input}
             value={destination}
@@ -137,6 +139,8 @@ const CreateChecklist = () => {
           {items.map((item, index) => (
             <TextInput
               key={index}
+              placeholderTextColor="#999"
+
               placeholder={`Item ${index + 1}`}
               style={[groupStyle.input, { marginBottom: height * 0.01 }]}
               value={item.name}

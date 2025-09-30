@@ -39,7 +39,7 @@ const CreateEvent = () => {
 
       const payload = { groupId, ...formData };
       const response = await axios.post(
-        'https://32b5245c5f10.ngrok-free.app/api/home/createEvent',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/home/createEvent',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -67,6 +67,8 @@ const CreateEvent = () => {
           <Text style={groupStyle.label}>Title</Text>
           <TextInput
             placeholder="Enter Event Title"
+            placeholderTextColor="#999"
+
             value={formData.title}
             onChangeText={(text) => handleChange('title', text)}
             style={groupStyle.input}
@@ -78,6 +80,8 @@ const CreateEvent = () => {
           <Text style={groupStyle.label}>Description</Text>
           <TextInput
             placeholder="Enter Description"
+            placeholderTextColor="#999"
+
             value={formData.description}
             onChangeText={(text) => handleChange('description', text)}
             style={[groupStyle.input, { height: 100, textAlignVertical: 'top' }]}

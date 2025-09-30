@@ -31,7 +31,7 @@ const AttemptQuiz = () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
         const response = await axios.get(
-          `https://32b5245c5f10.ngrok-free.app/api/school/fetchquiz/${quizId}`,
+          `https://37prw4st-5000.asse.devtunnels.ms/api/school/fetchquiz/${quizId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ const AttemptQuiz = () => {
       const token = await AsyncStorage.getItem('userToken');
 
       await axios.post(
-        `https://32b5245c5f10.ngrok-free.app/api/school/quiz/${quiz._id}/submit`,
+        `https://37prw4st-5000.asse.devtunnels.ms/api/school/quiz/${quiz._id}/submit`,
         payload,
         {
           headers: {

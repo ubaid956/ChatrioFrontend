@@ -9,7 +9,8 @@ import {
     Alert,
     TouchableOpacity,
     SafeAreaView,
-    Modal
+    Modal,
+    Platform
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import React, { useState, useEffect } from 'react';
@@ -51,7 +52,7 @@ const CreateGroup = () => {
                 }
 
                 const res = await axios.get(
-                    'https://32b5245c5f10.ngrok-free.app/api/auth/users',
+                    'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users',
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setUsers(res.data.data);
@@ -77,7 +78,7 @@ const CreateGroup = () => {
 
 
             await axios.post(
-                'https://32b5245c5f10.ngrok-free.app/api/groups',
+                'https://37prw4st-5000.asse.devtunnels.ms/api/groups',
                 { name: groupName, users: selectedUsers, type: groupType },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -139,7 +140,7 @@ const CreateGroup = () => {
             };
 
             await axios.post(
-                'https://32b5245c5f10.ngrok-free.app/api/groups',
+                'https://37prw4st-5000.asse.devtunnels.ms/api/groups',
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -222,16 +223,41 @@ const CreateGroup = () => {
                             borderWidth: 1,
                             borderColor: '#ccc',
                             borderRadius: 5,
-                            marginBottom: 20
+                            marginBottom: 20,
+                            height: Platform.OS === 'ios' ? 50 : 60, // Different heights for iOS and Android
+                            justifyContent: 'center',
+                            backgroundColor: '#fff'
                         }}>
                             <Picker
                                 selectedValue={newGroupType}
                                 onValueChange={(itemValue) => setNewGroupType(itemValue)}
+                                style={{
+                                    height: Platform.OS === 'ios' ? 50 : 60,
+                                    width: '100%',
+                                    color: '#000', // Ensure text color is visible
+                                    backgroundColor: 'transparent',
+                                    ...Platform.select({
+                                        ios: {
+                                            fontSize: 16,
+                                        },
+                                        android: {
+                                            fontSize: 16,
+                                            color: '#fcfcfcff',
+                                            marginLeft: 10,
+                                        }
+                                    })
+                                }}
+                                itemStyle={{
+                                    height: Platform.OS === 'ios' ? 50 : 60,
+                                    color: '#000', // Ensure item text color is visible
+                                    fontSize: 16,
+                                }}
+                                mode={Platform.OS === 'android' ? 'dropdown' : 'default'}
                             >
-                                <Picker.Item label="Home" value="Home" />
-                                <Picker.Item label="Work" value="Work" />
-                                <Picker.Item label="School" value="School" />
-                                <Picker.Item label="Travel" value="Travel" />
+                                <Picker.Item label="Home" value="Home" color="#000" />
+                                <Picker.Item label="Work" value="Work" color="#000" />
+                                <Picker.Item label="School" value="School" color="#000" />
+                                <Picker.Item label="Travel" value="Travel" color="#000" />
                             </Picker>
                         </View>
 

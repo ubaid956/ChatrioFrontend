@@ -35,7 +35,7 @@ const CreateSplitExpense = () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
         const res = await axios.get(
-          `https://32b5245c5f10.ngrok-free.app/api/groups/${groupId}/users`,
+          `https://37prw4st-5000.asse.devtunnels.ms/api/groups/${groupId}/users`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUsers(res.data.users);
@@ -68,7 +68,7 @@ const CreateSplitExpense = () => {
       };
 
       const response = await axios.post(
-        'https://32b5245c5f10.ngrok-free.app/api/travel/splitepense',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/travel/splitepense',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -95,6 +95,8 @@ const CreateSplitExpense = () => {
           <Text style={groupStyle.label}>Title</Text>
           <TextInput
             placeholder="Enter Expense Title"
+            placeholderTextColor="#999"
+
             value={title}
             onChangeText={setTitle}
             style={groupStyle.input}
@@ -106,6 +108,8 @@ const CreateSplitExpense = () => {
           <TextInput
             placeholder="Enter Amount"
             value={amount}
+            placeholderTextColor="#999"
+
             onChangeText={setAmount}
             keyboardType="numeric"
             style={groupStyle.input}

@@ -18,10 +18,12 @@ import CustomButton from '@/app/Components/CustomButton';
 import { globalStyles } from '@/Styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
 const About = () => {
+    const { t } = useTranslation();
     const params = useLocalSearchParams();
     const currentAbout = params.currentAbout || '';
 
@@ -31,17 +33,17 @@ const About = () => {
     const [updating, setUpdating] = useState(false);
 
     const aboutOptions = [
-        'Available',
-        'Busy',
-        'At school',
-        'At the movies',
-        'At work',
-        'Battery about to die',
-        'Can\'t talk, WhatsApp only',
-        'In a meeting',
-        'At the gym',
-        'Sleeping',
-        'Urgent calls only'
+        { key: 'available', text: t('about.available') },
+        { key: 'busy', text: t('about.busy') },
+        { key: 'atSchool', text: t('about.atSchool') },
+        { key: 'atMovies', text: t('about.atMovies') },
+        { key: 'atWork', text: t('about.atWork') },
+        { key: 'batteryDying', text: t('about.batteryDying') },
+        { key: 'whatsappOnly', text: t('about.whatsappOnly') },
+        { key: 'inMeeting', text: t('about.inMeeting') },
+        { key: 'atGym', text: t('about.atGym') },
+        { key: 'sleeping', text: t('about.sleeping') },
+        { key: 'urgentOnly', text: t('about.urgentOnly') }
     ];
 
     const onSave = async (newAbout) => {
@@ -51,7 +53,7 @@ const About = () => {
             if (!userToken) throw new Error('User not authenticated');
 
             const response = await axios.put(
-                'https://32b5245c5f10.ngrok-free.app/api/auth/users/profile',
+                'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/profile',
                 { bio: newAbout },
                 {
                     headers: {
@@ -67,11 +69,11 @@ const About = () => {
             };
 
             await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
-            Alert.alert('Success', 'About status updated!');
+            Alert.alert(t('about.success'), t('about.aboutUpdated'));
             router.back(); // Navigate back after save
         } catch (error) {
             console.error('About update error:', error);
-            Alert.alert('Error', 'Failed to update about status');
+            Alert.alert(t('about.error'), t('about.updateFailed'));
         } finally {
             setUpdating(false);
         }
@@ -89,7 +91,7 @@ const About = () => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <CustomHeader
-                title="About"
+                title={t('about.title')}
                 onBackPress={() => router.back()}
             />
 
@@ -100,18 +102,18 @@ const About = () => {
                 <View style={styles.content}>
                     {/* Current About */}
                     <View style={styles.currentStatusContainer}>
-                        <Text style={styles.currentStatusLabel}>Currently set to</Text>
+                        <Text style={styles.currentStatusLabel}>{t('about.currentlySet')}</Text>
                         <Text style={styles.currentStatusText}>
-                            {currentAbout || 'Not set'}
+                            {currentAbout || t('about.notSet')}
                         </Text>
                     </View>
 
                     {isEditing ? (
                         <View style={styles.editContainer}>
-                            <Text style={styles.sectionTitle}>Add About</Text>
+                            <Text style={styles.sectionTitle}>{t('about.addAbout')}</Text>
                             <TextInput
                                 style={styles.textInput}
-                                placeholder="Type your custom status"
+                                placeholder={t('about.customStatusPlaceholder')}
                                 value={customAbout}
                                 onChangeText={setCustomAbout}
                                 autoFocus={true}
@@ -121,7 +123,7 @@ const About = () => {
                                     style={styles.cancelButton}
                                     onPress={() => setIsEditing(false)}
                                 >
-                                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                                    <Text style={styles.cancelButtonText}>{t('about.cancel')}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.saveButton}
@@ -131,26 +133,26 @@ const About = () => {
                                     {updating ? (
                                         <ActivityIndicator size="small" color="white" />
                                     ) : (
-                                        <Text style={styles.saveButtonText}>Save</Text>
+                                        <Text style={styles.saveButtonText}>{t('about.save')}</Text>
                                     )}
                                 </TouchableOpacity>
                             </View>
                         </View>
                     ) : (
                         <>
-                            <Text style={styles.sectionTitle}>Select About</Text>
+                            <Text style={styles.sectionTitle}>{t('about.selectAbout')}</Text>
 
                             {aboutOptions.map((option) => (
                                 <TouchableOpacity
-                                    key={option}
+                                    key={option.key}
                                     style={[
                                         styles.optionItem,
-                                        selectedAbout === option && styles.selectedOption
+                                        selectedAbout === option.text && styles.selectedOption
                                     ]}
-                                    onPress={() => setSelectedAbout(option)}
+                                    onPress={() => setSelectedAbout(option.text)}
                                 >
-                                    <Text style={styles.optionText}>{option}</Text>
-                                    {selectedAbout === option && (
+                                    <Text style={styles.optionText}>{option.text}</Text>
+                                    {selectedAbout === option.text && (
                                         <MaterialIcons name="check" size={20} color="#0758C2" />
                                     )}
                                 </TouchableOpacity>
@@ -159,7 +161,7 @@ const About = () => {
                             <CustomButton
                                 style={styles.editButton}
                                 onPress={() => setIsEditing(true)}
-                                title="Add Custom About"
+                                title={t('about.addCustomAbout')}
                                 login
                             />
 
@@ -170,7 +172,7 @@ const About = () => {
                                     updating ? (
                                         <ActivityIndicator size="small" color="white" />
                                     ) : (
-                                        "Save About"
+                                        t('about.saveAbout')
                                     )
                                 }
                                 onPress={handleSave}

@@ -7,7 +7,7 @@
 // import * as Device from 'expo-device';
 // import axios from 'axios';
 
-// const BASE_URL = "https://32b5245c5f10.ngrok-free.app/";
+// const BASE_URL = "https://37prw4st-5000.asse.devtunnels.ms/";
 
 // Notifications.setNotificationHandler({
 //   handleNotification: async () => ({
@@ -468,7 +468,7 @@ export default function Index() {
 
 // const getUserProfile = async (token) => {
 //     try {
-//         const response = await fetch('https://32b5245c5f10.ngrok-free.app/api/auth/google', {
+//         const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/google', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',

@@ -12,8 +12,8 @@ import {
   View,
   Alert,
   ActivityIndicator,
-  SafeAreaView
-  , Platform
+  Modal,
+  SafeAreaView, Platform
 } from 'react-native';
 import CustomButton from '../Components/CustomButton';
 import Profile_cart from '../Components/Profile_cart';
@@ -25,6 +25,9 @@ import mime from 'mime';
 import AboutModal from '../Components/Profile_Components/AboutModal';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import i18n, { setAppLanguage } from '../../i18n/index';
+
+
 
 const { width, height } = Dimensions.get('window');
 const Profile = () => {
@@ -32,6 +35,8 @@ const Profile = () => {
   const navigation = useNavigation()
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
+
   const [uploading, setUploading] = useState(false);
 
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
@@ -47,7 +52,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        'https://32b5245c5f10.ngrok-free.app/api/auth/users/profile',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/profile',
         { bio: newAbout },
         {
           headers: {
@@ -134,7 +139,7 @@ const Profile = () => {
       console.log('FormData created, sending request...');
 
       const response = await axios.put(
-        'https://32b5245c5f10.ngrok-free.app/api/auth/users/profile',
+        'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/profile',
         formData,
         {
           headers: {
@@ -370,9 +375,11 @@ const Profile = () => {
               </View>
             ) : (
               <Image
-                source={{
-                  uri: user.pic || 'https://via.placeholder.com/150',
-                }}
+                source={
+                  !user.pic || user.pic === 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
+                    ? require('../../assets/images/user.jpg')
+                    : { uri: user.pic }
+                }
                 style={styles.profileImage}
               />
             )}
@@ -397,22 +404,19 @@ const Profile = () => {
           </View>
         </View>
 
-        {/* <View style={{ backgroundColor: 'white', marginTop: height * 0.03 }}>
-          <Text style={{ marginLeft: width * 0.04, fontSize: 16, marginTop: height * 0.02, color: '#6b7280' }}>
-            {t('profile.recentActivity')}
-          </Text>
-          <View style={{ backgroundColor: '#f4f4f4' }}>
-            <Profile_cart iconComponent={MaterialIcons} iconName="bookmark-outline" text={t('profile.savedItems')} />
-            <Profile_cart iconComponent={MaterialIcons} iconName="star" text={t('profile.reviews')} />
-          </View>
-        </View> */}
 
         <View style={{ backgroundColor: 'white', marginTop: height * 0.03, marginBottom: height * 0.02 }}>
           <Text style={{ marginLeft: width * 0.04, fontSize: 16, marginTop: height * 0.02, color: '#6b7280' }}>
             {t('profile.settingsSupport')}
           </Text>
           <View style={{ backgroundColor: '#f4f4f4' }}>
-            <Profile_cart iconComponent={MaterialIcons} iconName="settings" text={t('profile.accountSettings')} />
+            <Profile_cart
+              iconComponent={MaterialIcons}
+              iconName="language"
+              text={t('profile.language')}
+              onPress={() => setLanguageModalVisible(true)}
+            />
+
             <Profile_cart iconComponent={MaterialIcons} iconName="help" text={t('profile.helpCenter')} onPress={() => router.push('/Screens/Profile_Pages/HelpCenter')} />
             <Profile_cart iconComponent={MaterialIcons} iconName="privacy-tip" text={t('profile.termsPrivacy')} onPress={() => router.push('/Screens/Profile_Pages/TermsAndPrivacy')} />
           </View>
@@ -424,6 +428,63 @@ const Profile = () => {
           disabled={loading}
         />
       </ScrollView>
+      <Modal
+        visible={languageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLanguageModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>{t('profile.selectLanguage')}</Text>
+
+            {/* English */}
+            <TouchableOpacity
+              style={styles.languageButton}
+              onPress={async () => {
+                await setAppLanguage('en');
+                setLanguageModalVisible(false);
+              }}
+            >
+              <Text
+                style={[
+                  styles.languageText,
+                  i18n.language === 'en' && styles.selectedLanguage
+                ]}
+              >
+                English
+              </Text>
+            </TouchableOpacity>
+
+            {/* Arabic */}
+            <TouchableOpacity
+              style={styles.languageButton}
+              onPress={async () => {
+                await setAppLanguage('ar');
+                setLanguageModalVisible(false);
+              }}
+            >
+              <Text
+                style={[
+                  styles.languageText,
+                  i18n.language === 'ar' && styles.selectedLanguage
+                ]}
+              >
+                العربية
+              </Text>
+            </TouchableOpacity>
+
+            {/* Cancel */}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setLanguageModalVisible(false)}
+            >
+              <Text style={styles.cancelText}>{t('profile.cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
 
     </SafeAreaView>
   );
@@ -537,6 +598,50 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContainer: {
+    width: width * 0.8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center'
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 20,
+  },
+  languageButton: {
+    paddingVertical: 12,
+    width: '100%',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#eee'
+  },
+  languageText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedLanguage: {
+    color: '#007bff',
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    marginTop: 15,
+    paddingVertical: 10,
+  },
+  cancelText: {
+    color: '#ff4444',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+
 });
 
 export default Profile;
