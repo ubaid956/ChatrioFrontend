@@ -97,5 +97,17 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.isOtpExpired = function () {
   return this.otpExpiresAt ? new Date() > this.otpExpiresAt : true;
 };
+
+// Method to update last active timestamp
+userSchema.methods.updateLastActive = function () {
+  this.lastActive = new Date();
+  return this.save();
+};
+
+// Static method to check if user is recently active (within last 5 minutes)
+userSchema.statics.isRecentlyActive = function (lastActive) {
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  return new Date(lastActive) > fiveMinutesAgo;
+};
 const User = mongoose.model('User', userSchema);
 export default User;

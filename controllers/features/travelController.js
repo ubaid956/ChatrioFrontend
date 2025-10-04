@@ -6,6 +6,7 @@ import cloudinary from '../../cloudinaryConfig.js';
 import LocationShare from "../../models/features/travel/locationShare.model.js";
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid'; // for unique file naming
+import { sendGroupFeatureNotification } from '../../utils/notifications.js';
 // Create a new itinerary
 export const createItinerary = async (req, res) => {
   try {
@@ -31,6 +32,24 @@ export const createItinerary = async (req, res) => {
       groupId,
       sender: req.user._id
     });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'itinerary',
+        featureTitle: title,
+        featureId: itinerary._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Itinerary notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending itinerary notifications:', error);
+      // Don't fail the request if notifications fail
+    }
 
     res.status(201).json({ message: "Itinerary created successfully", itinerary });
   } catch (error) {
@@ -125,6 +144,24 @@ export const createChecklist = async (req, res) => {
       sender: req.user._id
     });
 
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'checklist',
+        featureTitle: `Travel checklist for ${destination}`,
+        featureId: checklist._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Travel checklist notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending travel checklist notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json({ message: "Checklist created successfully", checklist });
   } catch (error) {
     console.error("Error creating checklist:", error);
@@ -179,6 +216,25 @@ export const splitExpense = async (req, res) => {
     const paidBy = req.user._id;
 
     const expense = await Expense.create({ title, amount, paidBy, sharedWith, groupId, sender: req.user._id });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'expense',
+        featureTitle: title,
+        featureId: expense._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Expense notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending expense notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json({ message: "Expense recorded", expense });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -309,6 +365,24 @@ export const uploadDocument = async (req, res) => {
       sender: req.user._id
     });
 
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'document',
+        featureTitle: title,
+        featureId: document._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Document notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending document notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json({ message: 'Document uploaded', document });
   } catch (err) {
     console.error('Upload error:', err);
@@ -342,6 +416,24 @@ export const shareLocation = async (req, res) => {
       locationName,
       message
     });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'location',
+        featureTitle: locationName || 'Location shared',
+        featureId: location._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Location notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending location notifications:', error);
+      // Don't fail the request if notifications fail
+    }
 
     res.status(201).json({ message: "Location shared successfully", location });
   } catch (error) {

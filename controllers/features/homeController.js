@@ -3,6 +3,7 @@ import Budget from '../../models/features/home/budget.model.js'
 import Chore from '../../models/features/home/chore.model.js'
 import Event from "../../models/features/home/eventCalender.model.js";
 import Reminder from "../../models/features/home/reminder.model.js";
+import { sendGroupFeatureNotification } from '../../utils/notifications.js';
 
 //Shopping List
 export const addMultipleItems = async (req, res) => {
@@ -23,6 +24,24 @@ export const addMultipleItems = async (req, res) => {
     }));
 
     const savedItems = await ShoppingList.insertMany(newItems);
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: userId.toString(),
+        senderName: req.user.name,
+        featureType: 'shopping',
+        featureTitle: `${items.length} items added to shopping list`,
+        featureId: savedItems[0]._id // Use first item's ID as reference
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Shopping list notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending shopping list notifications:', error);
+      // Don't fail the request if notifications fail
+    }
 
     res.status(201).json({ message: 'Items added successfully', items: savedItems });
   } catch (error) {
@@ -59,6 +78,25 @@ export const addBudgetItem = async (req, res) => {
   try {
     const { title, amount, type, category, groupId } = req.body;
     const item = await Budget.create({ title, amount, type, category, groupId, createdBy: req.user._id });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'budget',
+        featureTitle: title,
+        featureId: item._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Budget item notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending budget item notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json({ message: 'Budget item added', item });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -81,6 +119,25 @@ export const createChore = async (req, res) => {
   try {
     const { task, assignedTo, dueDate, groupId } = req.body;
     const chore = await Chore.create({ task, assignedTo, dueDate, groupId });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'chore',
+        featureTitle: task,
+        featureId: chore._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Chore notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending chore notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json({ message: 'Chore created', chore });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -162,6 +219,24 @@ export const createEvent = async (req, res) => {
       createdBy: req.user._id,
       reminderTime: new Date(date), // same as event date/time
     });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'event',
+        featureTitle: title,
+        featureId: event._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Event notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending event notifications:', error);
+      // Don't fail the request if notifications fail
+    }
 
     res.status(201).json({
       message: "Event and reminder created successfully",

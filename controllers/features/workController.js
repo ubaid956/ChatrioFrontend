@@ -9,6 +9,8 @@ import { google } from 'googleapis';
 import oauth2Client from '../../utils/googleAuth.js';
 import axios from 'axios';
 import { generateZoomAccessToken } from '../../utils/zoomAuth.js';
+import { sendGroupFeatureNotification } from '../../utils/notifications.js';
+import User from '../../models/User.js';
 
 
 // Tasks
@@ -41,6 +43,24 @@ export const createTask = async (req, res) => {
       sender: req.user._id
     });
 
+    // 4. Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'task',
+        featureTitle: title,
+        featureId: task._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Task notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending task notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json(task);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -62,6 +82,25 @@ export const scheduleMeeting = async (req, res) => {
   try {
     const { groupId, title, scheduledAt, attendees } = req.body;
     const meeting = await Meeting.create({ groupId, title, scheduledAt, attendees, sender: req.user._id });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'meeting',
+        featureTitle: title,
+        featureId: meeting._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Meeting notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending meeting notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json(meeting);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -146,6 +185,24 @@ export const createMeeting = async (req, res) => {
       groupId: groupId
     });
 
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'meeting',
+        featureTitle: topic,
+        featureId: newMeeting._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Zoom meeting notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending Zoom meeting notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(200).json(newMeeting);
   } catch (err) {
     console.error(err.response?.data || err.message);
@@ -184,6 +241,25 @@ export const postIdea = async (req, res) => {
   try {
     const { groupId, content, title } = req.body;
     const idea = await Idea.create({ groupId, content, sender: req.user._id, title });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'idea',
+        featureTitle: title,
+        featureId: idea._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Idea notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending idea notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json(idea);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -205,6 +281,25 @@ export const addNote = async (req, res) => {
   try {
     const { groupId, title, content } = req.body;
     const note = await Note.create({ groupId, title, content, sender: req.user._id });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: req.user._id.toString(),
+        senderName: req.user.name,
+        featureType: 'note',
+        featureTitle: title,
+        featureId: note._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Note notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending note notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json(note);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -265,6 +360,25 @@ export const createPoll = async (req, res) => {
 
     // Create poll
     const poll = await Poll.create({ groupId, question, options, sender });
+
+    // Send notifications to group members (excluding sender)
+    try {
+      const notificationResults = await sendGroupFeatureNotification({
+        groupId: groupId.toString(),
+        senderId: sender.toString(),
+        senderName: req.user.name,
+        featureType: 'poll',
+        featureTitle: question,
+        featureId: poll._id
+      });
+
+      const successful = notificationResults.filter(r => r.success).length;
+      console.log(`📊 Poll notification summary: ${successful} sent successfully`);
+    } catch (error) {
+      console.error('❌ Error sending poll notifications:', error);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json(poll);
   } catch (error) {
     res.status(500).json({ message: error.message });

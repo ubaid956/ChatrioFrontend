@@ -91,100 +91,34 @@ export const register = async (req, res) => {
 
 // @desc    Authenticate user
 
-// Login with phone and password working perfectly 
-// export const login = async (req, res) => {
-//   try {
-//     const { phone, password } = req.body;
-
-//     // 1. Check if user exists
-//     const user = await User.findOne({ phone }).select('+password'); // Explicitly select password
-//     if (!user) {
-//       return res.status(400).json({ message: 'User not found' });
-//     }
-
-//     // 2. Compare passwords (ensure password is not undefined)
-//     if (!password || !user.password) {
-//       return res.status(400).json({ message: 'Password missing' });
-//     }
-
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) {
-//       return res.status(400).json({ message: 'Invalid credentials' });
-//     }
-
-//     // 3. Generate token
-//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-//       expiresIn: '30d',
-//     });
-
-//     // 4. Return response (exclude password)
-//     const userWithoutPassword = { ...user._doc };
-//     delete userWithoutPassword.password;
-
-//     res.json({
-//       ...userWithoutPassword,
-//       token,
-//     });
-//   } catch (error) {
-//     console.error('Login error:', error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-//Login works with firebase phone auth 
-
+// Login with phone and password working perfectly
 export const login = async (req, res) => {
   try {
-    const { phone, password, firebaseToken } = req.body;
+    const { phone, password } = req.body;
 
     // 1. Check if user exists
-    const user = await User.findOne({ phone });
+    const user = await User.findOne({ phone }).select('+password'); // Explicitly select password
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
     }
 
-    // 2. Handle Firebase phone authentication
-    if (firebaseToken) {
-      // Verify Firebase token
-      const firebaseUser = await verifyFirebaseToken(firebaseToken);
-
-      if (!firebaseUser) {
-        return res.status(400).json({ message: 'Firebase verification failed' });
-      }
-
-      // Check if the phone number matches (handle different formats)
-      const firebasePhone = firebaseUser.phone_number;
-      const normalizedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-
-      if (firebasePhone !== normalizedPhone) {
-        console.log('Phone mismatch:', { firebasePhone, normalizedPhone, originalPhone: phone });
-        return res.status(400).json({ message: 'Phone number mismatch' });
-      }
-
-      // Firebase verification successful - proceed to generate token
-    }
-    // 3. Handle password authentication (existing flow)
-    else if (password) {
-      if (!user.password) {
-        return res.status(400).json({ message: 'Password not set for this user' });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
-      }
-    } else {
-      return res.status(400).json({ message: 'Authentication method required' });
+    // 2. Compare passwords (ensure password is not undefined)
+    if (!password || !user.password) {
+      return res.status(400).json({ message: 'Password missing' });
     }
 
-    // 4. Generate token (common for both methods)
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // 3. Generate token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '30d',
     });
 
-    // 5. Return response (exclude password)
-    const userWithoutPassword = user.toObject();
+    // 4. Return response (exclude password)
+    const userWithoutPassword = { ...user._doc };
     delete userWithoutPassword.password;
 
     res.json({
@@ -196,6 +130,106 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+//Login works with firebase phone auth 
+
+// export const login = async (req, res) => {
+//   try {
+//     const { phone, password, firebaseToken } = req.body;
+
+//     console.log('=== LOGIN ATTEMPT ===');
+//     console.log('Received phone:', phone);
+//     console.log('Received password:', password ? '[PRESENT]' : '[MISSING]');
+//     console.log('Received firebaseToken:', firebaseToken ? '[PRESENT]' : '[MISSING]');
+
+//     // 1. Check if user exists
+//     console.log('Searching for user with phone:', phone);
+//     const user = await User.findOne({ phone });
+//     console.log('User found:', user ? 'YES' : 'NO');
+
+//     if (user) {
+//       console.log('Found user:', {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//         hasPassword: !!user.password
+//       });
+//     }
+
+//     if (!user) {
+//       console.log('❌ User not found in database');
+//       return res.status(400).json({ message: 'User not found' });
+//     }
+
+//     // 2. Handle Firebase phone authentication
+//     if (firebaseToken) {
+//       // Verify Firebase token
+//       const firebaseUser = await verifyFirebaseToken(firebaseToken);
+
+//       if (!firebaseUser) {
+//         return res.status(400).json({ message: 'Firebase verification failed' });
+//       }
+
+//       // Check if the phone number matches (handle different formats)
+//       const firebasePhone = firebaseUser.phone_number;
+//       const normalizedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+
+//       if (firebasePhone !== normalizedPhone) {
+//         console.log('Phone mismatch:', { firebasePhone, normalizedPhone, originalPhone: phone });
+//         return res.status(400).json({ message: 'Phone number mismatch' });
+//       }
+
+//       // Firebase verification successful - proceed to generate token
+//     }
+//     // 3. Handle password authentication (existing flow)
+//     else if (password) {
+//       console.log('🔐 Starting password authentication...');
+
+//       if (!user.password) {
+//         console.log('❌ No password set for this user');
+//         return res.status(400).json({ message: 'Password not set for this user' });
+//       }
+
+//       console.log('Comparing passwords...');
+//       console.log('Provided password length:', password.length);
+//       console.log('Stored password hash exists:', !!user.password);
+
+//       const isMatch = await bcrypt.compare(password, user.password);
+//       console.log('Password match result:', isMatch);
+
+//       if (!isMatch) {
+//         console.log('❌ Password comparison failed');
+//         return res.status(400).json({ message: 'Invalid credentials' });
+//       }
+
+//       console.log('✅ Password authentication successful');
+//     } else {
+//       console.log('❌ No authentication method provided');
+//       return res.status(400).json({ message: 'Authentication method required' });
+//     }
+
+//     // 4. Generate token (common for both methods)
+//     console.log('🔑 Generating JWT token...');
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: '30d',
+//     });
+
+//     // 5. Return response (exclude password)
+//     console.log('📤 Preparing response...');
+//     const userWithoutPassword = user.toObject();
+//     delete userWithoutPassword.password;
+
+//     console.log('✅ LOGIN SUCCESSFUL! Sending response for user:', user._id);
+//     res.json({
+//       ...userWithoutPassword,
+//       token,
+//     });
+//   } catch (error) {
+//     console.error('Login error:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 // Helper function to verify Firebase token
 async function verifyFirebaseToken(idToken) {
@@ -823,13 +857,26 @@ export const updatePushToken = async (req, res) => {
   try {
     const { userId, pushToken } = req.body;
 
-    if (!userId || !pushToken) {
-      return res.status(400).json({ success: false, message: "userId and pushToken required" });
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+
+    // Accept Expo push tokens and raw FCM tokens (EAS/Custom clients may return non-Expo tokens).
+    // Normalize token by trimming. We will still store whatever the client provides so server
+    // can attempt Expo send or fallback to FCM using firebase-admin.
+    let validatedToken = null;
+    if (pushToken) {
+      const token = pushToken.trim();
+      if (token.length < 10) {
+        console.warn('Push token too short or invalid:', token);
+        return res.status(400).json({ success: false, message: 'Invalid push token' });
+      }
+      validatedToken = token;
     }
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { pushToken },
+      { pushToken: validatedToken, lastActive: new Date() },
       { new: true }
     );
 
@@ -837,7 +884,13 @@ export const updatePushToken = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    res.json({ success: true, pushToken: user.pushToken });
+    console.log(`✅ Updated push token for user ${user.name} (${userId}):`, validatedToken ? '✓ Token set' : '✗ Token removed');
+
+    res.json({
+      success: true,
+      pushToken: user.pushToken,
+      message: validatedToken ? 'Push token updated successfully' : 'Push token removed successfully'
+    });
   } catch (error) {
     console.error("updatePushToken error:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -864,5 +917,379 @@ export const getLoggedInUser = async (req, res) => {
   } catch (err) {
     console.error('Error fetching logged-in user:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Test push notification endpoint for Android/iOS
+export const sendTestNotification = async (req, res) => {
+  try {
+    const { userId, platform = 'unknown' } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required"
+      });
+    }
+
+    // Find user and their push token
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    if (!user.pushToken) {
+      return res.status(400).json({
+        success: false,
+        message: "User doesn't have a push token registered"
+      });
+    }
+
+    console.log(`🧪 Sending test notification to ${platform} user:`, user.name);
+    console.log(`📱 Push token:`, user.pushToken);
+
+    // Prepare the push notification message
+    const message = {
+      to: user.pushToken,
+      sound: 'default',
+      title: `Chatrio Test (${platform.toUpperCase()})`,
+      body: `🎉 Push notifications are working perfectly on ${platform}!`,
+      data: {
+        test: true,
+        platform: platform,
+        userId: userId
+      },
+      priority: 'high',
+      // Android specific settings
+      android: {
+        channelId: 'default',
+        sound: 'default',
+        priority: 'high',
+        vibrate: [0, 250, 250, 250],
+        sticky: false,
+        notification: {
+          color: '#0758C2',
+          tag: `test-${Date.now()}`,
+          clickAction: '.MainActivity'
+        }
+      },
+      // iOS specific settings
+      ios: {
+        sound: 'default',
+        badge: 1,
+      }
+    };
+
+    console.log('📤 Sending notification:', message);
+
+    // Use Expo SDK instead of direct API call
+    const { Expo } = await import('expo-server-sdk');
+    const expo = new Expo();
+
+    try {
+      const chunks = expo.chunkPushNotifications([message]);
+      const tickets = [];
+
+      for (let chunk of chunks) {
+        const ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        tickets.push(...ticketChunk);
+      }
+
+      console.log('✅ Expo push tickets:', tickets);
+
+      // Check for errors in tickets
+      for (let ticket of tickets) {
+        if (ticket.status === 'error') {
+          console.error('❌ Push notification error:', ticket.message, ticket.details);
+          return res.status(400).json({
+            success: false,
+            message: 'Push notification failed',
+            error: ticket.message,
+            details: ticket.details
+          });
+        }
+      }
+
+      // All tickets were successful
+      res.json({
+        success: true,
+        message: `Test notification sent successfully to ${platform}`,
+        pushToken: user.pushToken,
+        pushResult: tickets[0],
+        ticketId: tickets[0].id
+      });
+
+    } catch (error) {
+      console.error('❌ Push notification error:', error);
+      res.status(400).json({
+        success: false,
+        message: 'Push notification failed',
+        error: error.message || 'Unknown error'
+      });
+    }
+
+  } catch (error) {
+    console.error("❌ sendTestNotification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error sending test notification",
+      error: error.message
+    });
+  }
+};
+
+// Debug push notification setup
+export const debugPushNotifications = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required"
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    console.log('🔍 Push Notification Debug Info:');
+    console.log('User:', user.name || user.userName);
+    console.log('User ID:', user._id);
+    console.log('Push Token:', user.pushToken || 'NOT SET');
+    console.log('Is Online:', user.isOnline);
+    console.log('Last Active:', user.lastActive);
+
+    // Validate push token format
+    let tokenValid = false;
+    if (user.pushToken) {
+      // Expo push tokens should start with ExponentPushToken or ExpoPushToken
+      const token = user.pushToken.trim();
+      tokenValid = (token.startsWith('ExponentPushToken[') || token.startsWith('ExpoPushToken[')) && token.endsWith(']');
+      console.log('Token Format Valid:', tokenValid, 'Token:', token.substring(0, 25) + '...');
+    }
+
+    // Test notification using Expo SDK directly
+    if (user.pushToken && tokenValid) {
+      console.log('📤 Sending debug notification via Expo API...');
+
+      const testMessage = {
+        to: user.pushToken,
+        sound: 'default',
+        title: 'Debug Test 🔧',
+        body: 'This is a debug test from Chatrio server',
+        data: { debug: true, timestamp: Date.now() },
+        priority: 'high',
+        android: {
+          channelId: 'default',
+          sound: 'default',
+          priority: 'high',
+          vibrate: [0, 250, 250, 250],
+        },
+        ios: {
+          sound: 'default',
+          badge: 1,
+        }
+      };
+
+      // Send via direct API call
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testMessage),
+      });
+
+      const result = await response.json();
+      console.log('API Response:', result);
+
+      return res.json({
+        success: true,
+        debug: {
+          user: {
+            name: user.name || user.userName,
+            id: user._id,
+            hasToken: !!user.pushToken,
+            tokenValid,
+            isOnline: user.isOnline,
+            lastActive: user.lastActive
+          },
+          token: user.pushToken,
+          apiResponse: result
+        }
+      });
+    }
+
+    res.json({
+      success: false,
+      debug: {
+        user: {
+          name: user.name || user.userName,
+          id: user._id,
+          hasToken: !!user.pushToken,
+          tokenValid,
+          isOnline: user.isOnline,
+          lastActive: user.lastActive
+        },
+        token: user.pushToken,
+        error: !user.pushToken ? 'No push token found' : 'Invalid token format'
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Debug push notifications error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error debugging push notifications",
+      error: error.message
+    });
+  }
+};
+
+// Android-specific notification debugging
+export const sendAndroidNotificationTest = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required"
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user || !user.pushToken) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found or no push token"
+      });
+    }
+
+    console.log(`🤖 Testing Android-specific notification for user:`, user.name);
+    console.log(`📱 Push token:`, user.pushToken);
+
+    // Send multiple test notifications with different configurations
+    const testMessages = [
+      {
+        name: "High Priority Test",
+        message: {
+          to: user.pushToken,
+          sound: 'default',
+          title: 'Android Test 1 🤖',
+          body: 'High priority notification with max importance',
+          data: { test: 'android-high-priority', timestamp: Date.now() },
+          priority: 'high',
+          android: {
+            channelId: 'high-priority',
+            sound: 'default',
+            priority: 'max',
+            vibrate: [0, 500, 250, 500],
+            notification: {
+              color: '#FF0000',
+              sticky: true,
+              tag: `android-test-1-${Date.now()}`
+            }
+          }
+        }
+      },
+      {
+        name: "Default Channel Test",
+        message: {
+          to: user.pushToken,
+          sound: 'default',
+          title: 'Android Test 2 🔔',
+          body: 'Default channel notification',
+          data: { test: 'android-default', timestamp: Date.now() },
+          priority: 'high',
+          android: {
+            channelId: 'default',
+            sound: 'default',
+            priority: 'high',
+            vibrate: [0, 250, 250, 250],
+            notification: {
+              color: '#0758C2',
+              sticky: false,
+              tag: `android-test-2-${Date.now()}`
+            }
+          }
+        }
+      },
+      {
+        name: "Simple Test",
+        message: {
+          to: user.pushToken,
+          sound: 'default',
+          title: 'Android Test 3 ⚡',
+          body: 'Simple notification without extra config',
+          data: { test: 'android-simple', timestamp: Date.now() },
+          priority: 'high'
+        }
+      }
+    ];
+
+    const results = [];
+
+    for (const test of testMessages) {
+      try {
+        console.log(`📤 Sending ${test.name}...`);
+
+        const response = await fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(test.message),
+        });
+
+        const result = await response.json();
+        console.log(`✅ ${test.name} result:`, result);
+
+        results.push({
+          test: test.name,
+          success: result.data && result.data.status === 'ok',
+          result: result
+        });
+
+        // Wait 2 seconds between tests
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (error) {
+        console.error(`❌ ${test.name} failed:`, error);
+        results.push({
+          test: test.name,
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Android notification tests completed',
+      pushToken: user.pushToken,
+      results: results,
+      note: 'Check your Android device for 3 different test notifications'
+    });
+
+  } catch (error) {
+    console.error("❌ Android notification test error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error testing Android notifications",
+      error: error.message
+    });
   }
 };

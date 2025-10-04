@@ -8,12 +8,12 @@ const messageSchema = new mongoose.Schema({
   group: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Group',
-    required: function() { return !this.isPrivate; } // Only required for non-private messages
+    required: function () { return !this.isPrivate; } // Only required for non-private messages
   },
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: function() { return this.isPrivate; } // Required for private messages
+    required: function () { return this.isPrivate; } // Required for private messages
   },
   text: {
     type: String,
@@ -39,7 +39,7 @@ const messageSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-   
+
 }, {
   timestamps: true,
   toJSON: {
@@ -57,7 +57,7 @@ const messageSchema = new mongoose.Schema({
 // messageSchema.index({ createdAt: -1 });
 
 // Middleware to update group's last message timestamp
-messageSchema.post('save', async function(doc) {
+messageSchema.post('save', async function (doc) {
   await mongoose.model('Group').findByIdAndUpdate(doc.group, {
     lastMessageAt: doc.createdAt
   });

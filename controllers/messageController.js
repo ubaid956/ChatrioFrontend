@@ -7,7 +7,12 @@ import cloudinary from '../cloudinaryConfig.js';
 import * as Notifications from 'expo-server-sdk';
 
 import { onlineUsers } from '../utils/socket.js';
-import { sendExpoPush } from '../utils/push.js';
+import { sendExpoPush, sendMultipleExpoPush } from '../utils/push.js';
+import {
+  sendPrivateMessageNotification,
+  sendGroupMessageNotifications,
+  isUserOnline
+} from '../utils/notifications.js';
 
 // Work Imports
 import Task from '../models/features/work/task.model.js';
@@ -444,42 +449,47 @@ export const createMessage = async (req, res) => {
       select: 'name pic currentStatus mood'
     });
 
-    // Emit to group members via socket
+    // 1) Real-time socket notification to group members
     const io = req.app.get('io');
     if (io) {
-      console.log('Emitting groupMessage to group:', groupId);
+      console.log(`📱 Emitting groupMessage to group: ${groupId}`);
       io.to(groupId.toString()).emit('groupMessage', populatedMessage);
     }
 
-    // 2) Push notifications: notify offline group members (exclude sender)
+    // 2) Push notifications: notify all group members (exclude sender)
     try {
-      const group = await Group.findById(groupId).populate('members', 'pushToken name _id');
-      if (group) {
-        const senderIdStr = senderId ? senderId.toString() : (req.user?._id?.toString && req.user._id.toString());
-        const pushBody = hasText ? populatedMessage.text : '🎵 Audio message';
-        for (const member of group.members) {
-          const memberIdStr = member._id.toString();
-          if (memberIdStr === senderIdStr) continue; // don't notify sender
+      const senderIdStr = senderId.toString();
+      const pushBody = hasText ? text : '🎵 Audio message';
 
-          // Check if member is offline
-          const sockets = onlineUsers.get(memberIdStr);
-          if (!sockets || sockets.size === 0) {
-            if (member.pushToken) {
-              await sendExpoPush(member.pushToken, {
-                title: `${group.name}`,
-                body: pushBody,
-                data: { type: 'group_message', groupId, messageId: message._id }
-              });
-            }
-          }
-        }
+      console.log(`🚀 Starting group notification process for message from ${populatedMessage.sender.name} (${senderIdStr})`);
+      console.log(`📝 Message content: "${pushBody}"`);
+
+      const notificationResults = await sendGroupMessageNotifications({
+        groupId: groupId.toString(),
+        senderId: senderIdStr,
+        senderName: populatedMessage.sender.name,
+        messageText: pushBody,
+        messageId: message._id
+      });
+
+      // Log summary of notification results
+      const successful = notificationResults.filter(r => r.success).length;
+      const failed = notificationResults.filter(r => !r.success && !r.skipped).length;
+
+      if (failed > 0) {
+        console.log(`⚠️ ${failed} group push notifications failed`);
       }
-    } catch (err) {
-      console.error('Error sending group push notifications:', err);
+
+      console.log(`📊 Group notification summary: ${successful} sent successfully`);
+
+    } catch (error) {
+      console.error('❌ Error sending group push notifications:', error);
+      // Don't fail the request if push notifications fail
     }
 
     res.status(201).json(populatedMessage);
   } catch (error) {
+    console.error('❌ Error creating group message:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -594,8 +604,11 @@ export const sendPrivateMessage = async (req, res) => {
     const { recipientId, text, duration } = req.body;
     const io = req.app.get('io');
 
+    // Validate recipient exists
     const recipient = await User.findById(recipientId);
-    if (!recipient) return res.status(404).json({ message: 'Recipient not found' });
+    if (!recipient) {
+      return res.status(404).json({ message: 'Recipient not found' });
+    }
 
     // Check if it's an audio message or text message
     const hasAudio = req.files?.audio;
@@ -637,27 +650,41 @@ export const sendPrivateMessage = async (req, res) => {
       select: 'name pic'
     });
 
-    // 1) In-app realtime
-    console.log('Emitting privateMessage to recipient:', recipientId.toString());
-    console.log('Message data:', populatedMsg);
-    io.to(recipientId.toString()).emit('privateMessage', populatedMsg);
+    // 1) Real-time socket notification to recipient
+    if (io) {
+      console.log(`📱 Emitting privateMessage to recipient: ${recipientId.toString()}`);
+      io.to(recipientId.toString()).emit('privateMessage', populatedMsg);
+    }
 
-    // 2) Push if recipient is offline
-    const sockets = onlineUsers.get(recipientId.toString());
-    if (!sockets || sockets.size === 0) {
-      if (recipient.pushToken) {
-        const pushBody = hasText ? populatedMsg.text : '🎵 Audio message';
-        await sendExpoPush(recipient.pushToken, {
-          title: `${populatedMsg.sender.name}`,
-          body: pushBody,
-          data: { type: 'chat_message', messageId: message._id }
-        });
+    // 2) Push notification if recipient is offline
+    try {
+      const senderIdStr = req.user._id.toString();
+      const recipientIdStr = recipientId.toString();
+
+      const pushBody = hasText ? text : '🎵 Audio message';
+
+      const notificationResult = await sendPrivateMessageNotification({
+        recipientId: recipientIdStr,
+        senderName: req.user.name,
+        messageText: pushBody,
+        messageId: message._id,
+        senderId: senderIdStr
+      });
+
+      if (notificationResult.success) {
+        console.log(`✅ Push notification sent to ${recipient.name}`);
+      } else {
+        console.error(`❌ Failed to send push notification to ${recipient.name}: ${notificationResult.error}`);
       }
+
+    } catch (error) {
+      console.error('❌ Error sending private message push notification:', error);
+      // Don't fail the request if push notification fails
     }
 
     res.status(201).json(populatedMsg);
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error sending private message:', error);
     res.status(500).json({ message: 'Failed to send message' });
   }
 };

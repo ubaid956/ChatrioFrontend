@@ -6,6 +6,7 @@ import cloudinary from '../../cloudinaryConfig.js';
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { sendGroupFeatureNotification } from '../../utils/notifications.js';
 
 
 
@@ -34,6 +35,24 @@ export const createAssignment = async (req, res) => {
             groupId,
             isPersonal: false
         });
+
+        // Send notifications to group members (excluding sender)
+        try {
+            const notificationResults = await sendGroupFeatureNotification({
+                groupId: groupId.toString(),
+                senderId: req.user._id.toString(),
+                senderName: req.user.name,
+                featureType: 'assignment',
+                featureTitle: title,
+                featureId: assignment._id
+            });
+
+            const successful = notificationResults.filter(r => r.success).length;
+            console.log(`📊 Assignment notification summary: ${successful} sent successfully`);
+        } catch (error) {
+            console.error('❌ Error sending assignment notifications:', error);
+            // Don't fail the request if notifications fail
+        }
 
         res.status(201).json({ message: 'Assignment created', assignment });
     } catch (error) {
@@ -314,6 +333,24 @@ export const generateQuiz = async (req, res) => {
         // Populate creator info in the response
         const populatedQuiz = await Quiz.findById(quiz._id)
             .populate('createdBy', 'name pic role');
+
+        // Send notifications to group members (excluding sender)
+        try {
+            const notificationResults = await sendGroupFeatureNotification({
+                groupId: groupId.toString(),
+                senderId: req.user._id.toString(),
+                senderName: req.user.name,
+                featureType: 'quiz',
+                featureTitle: `${topic} Quiz`,
+                featureId: quiz._id
+            });
+
+            const successful = notificationResults.filter(r => r.success).length;
+            console.log(`📊 Quiz notification summary: ${successful} sent successfully`);
+        } catch (error) {
+            console.error('❌ Error sending quiz notifications:', error);
+            // Don't fail the request if notifications fail
+        }
 
         res.status(201).json({
             message: "Quiz generated successfully",
@@ -611,6 +648,24 @@ export const uploadResource = async (req, res) => {
             },
             groupId: populatedResource.groupId
         };
+
+        // Send notifications to group members (excluding sender)
+        try {
+            const notificationResults = await sendGroupFeatureNotification({
+                groupId: groupId.toString(),
+                senderId: userId.toString(),
+                senderName: req.user.name,
+                featureType: 'resource',
+                featureTitle: title,
+                featureId: resource._id
+            });
+
+            const successful = notificationResults.filter(r => r.success).length;
+            console.log(`📊 Resource notification summary: ${successful} sent successfully`);
+        } catch (error) {
+            console.error('❌ Error sending resource notifications:', error);
+            // Don't fail the request if notifications fail
+        }
 
         res.status(201).json({
             message: 'Resource uploaded successfully',
