@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import { createServer } from 'http';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
@@ -18,6 +20,9 @@ import fileUpload from 'express-fileupload';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 app.use(fileUpload({ useTempFiles: true }));
 
@@ -28,6 +33,9 @@ app.use(express.json());
 app.use(cors({
   origin: '*'
 }));
+
+// Serve static files from public directory
+app.use(express.static(join(__dirname, 'public')));
 
 // Routes
 app.use('/api/auth', authRoutes);

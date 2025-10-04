@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sendMail from '../utils/sendmail.js';
 import Message from '../models/Message.js';
+import Group from '../models/Group.js';
 import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 import sendOTPViaSMS from '../utils/sendSMS.js'
@@ -1289,6 +1290,81 @@ export const sendAndroidNotificationTest = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error testing Android notifications",
+      error: error.message
+    });
+  }
+};
+
+// Delete user account
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id; // Get user ID from authenticated user
+
+    console.log(`🗑️ Account deletion requested for user: ${userId}`);
+
+    // Find the user first to get their information
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    console.log(`📋 Deleting account for: ${user.name} (${user.email})`);
+
+    // Delete all messages where user is sender or recipient
+    const messagesDeleted = await Message.deleteMany({
+      $or: [
+        { sender: userId },
+        { recipient: userId }
+      ]
+    });
+    console.log(`📨 Deleted ${messagesDeleted.deletedCount} messages`);
+
+    // Remove user from all groups (this will also remove them from group messages)
+    const groupsUpdated = await Group.updateMany(
+      { members: userId },
+      { $pull: { members: userId } }
+    );
+    console.log(`👥 Removed user from ${groupsUpdated.modifiedCount} groups`);
+
+    // If user was an admin of any groups, transfer ownership or delete the group
+    const adminGroups = await Group.find({ admin: userId });
+    for (const group of adminGroups) {
+      if (group.members.length > 1) {
+        // Transfer ownership to another member
+        const newAdmin = group.members.find(member => member.toString() !== userId.toString());
+        if (newAdmin) {
+          await Group.findByIdAndUpdate(group._id, { admin: newAdmin });
+          console.log(`👑 Transferred ownership of group ${group.name} to ${newAdmin}`);
+        }
+      } else {
+        // Delete the group if user is the only member
+        await Group.findByIdAndDelete(group._id);
+        console.log(`🗑️ Deleted group ${group.name} (only admin was the user)`);
+      }
+    }
+
+    // Delete the user account
+    await User.findByIdAndDelete(userId);
+    console.log(`✅ User account deleted successfully`);
+
+    res.status(200).json({
+      success: true,
+      message: "Account deleted successfully",
+      deletedData: {
+        messages: messagesDeleted.deletedCount,
+        groupsUpdated: groupsUpdated.modifiedCount,
+        adminGroupsHandled: adminGroups.length
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Account deletion error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting account",
       error: error.message
     });
   }

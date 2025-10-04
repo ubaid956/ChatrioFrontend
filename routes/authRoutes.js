@@ -3,7 +3,7 @@ import express from 'express';
 import {
      register, login,
      googleSignIn,
-     emailVerify, verifyOtp, updatePassword, getAllUsers, getUserById, profilePic, updateProfile, sendOtp, updatePushToken, getLoggedInUser, sendTestNotification, debugPushNotifications, sendAndroidNotificationTest
+     emailVerify, verifyOtp, updatePassword, getAllUsers, getUserById, profilePic, updateProfile, sendOtp, updatePushToken, getLoggedInUser, sendTestNotification, debugPushNotifications, sendAndroidNotificationTest, deleteAccount
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 const router = express.Router();
@@ -13,6 +13,9 @@ router.post('/login', login);
 router.post('/google', googleSignIn);
 
 router.get('/users', protect, getAllUsers)
+
+// Delete user account - MUST come before /users/:id route
+router.delete('/users/delete-account', protect, deleteAccount);
 
 //get user by id and all the chats bw specific user and logged in user
 router.get('/users/:id', protect, getUserById)
@@ -38,6 +41,5 @@ router.post('/debug-notifications', debugPushNotifications);
 
 // Android-specific notification testing
 router.post('/test-android-notifications', sendAndroidNotificationTest);
-
 
 export default router;
