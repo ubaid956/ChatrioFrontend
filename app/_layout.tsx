@@ -1,40 +1,9 @@
-// import { Stack } from 'expo-router';
-
-// export default function RootLayout() {
-//   return (
-//     <Stack screenOptions={{ headerShown: false }}>
-//       <Stack.Screen name="index" />
-//       <Stack.Screen name="Splash" />
-
-//       // Your entry point
-
-//       <Stack.Screen name="Screens/Welcome" />
-//       <Stack.Screen name="Screens/Login" />
-//       <Stack.Screen name='(tabs)'/>
-//       <Stack.Screen name="Screens/Signup" />
-//       <Stack.Screen name="Screens/Login_2" />
-//       <Stack.Screen name='Screens/ChatMessage' />
-//     </Stack>
-//   );
-// }
-
-
-// import { Stack } from 'expo-router';
-
-// export default function RootLayout() {
-//   return (
-//     <Stack
-//       screenOptions={{
-//         headerShown: false,
-//       }}
-//     />
-//   );
-// }
 
 import { Stack } from 'expo-router';
 import { View, Dimensions, Platform } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { GroupProvider } from '../context/GroupContext';
+import { NotificationProvider } from '../context/NotificationContext';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { loadLanguage } from '../i18n';
@@ -91,6 +60,7 @@ export default function RootLayout() {
             enableLights: true,
             showBadge: true,
             bypassDnd: true,
+            lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
             description: 'Notifications for new chat messages',
           });
 
@@ -109,6 +79,14 @@ export default function RootLayout() {
           });
 
           console.log('✅ Android notification channels configured successfully');
+
+          // Verify channels were created
+          try {
+            const channels = await Notifications.getNotificationChannelsAsync();
+            console.log('📱 Available notification channels:', channels.map(c => ({ id: c.id, name: c.name, importance: c.importance })));
+          } catch (error) {
+            console.log('⚠️ Could not verify notification channels:', error);
+          }
         } catch (error) {
           console.error('❌ Error setting up Android notifications:', error);
         }
@@ -116,19 +94,35 @@ export default function RootLayout() {
     };
 
     setupAndroidNotifications();
+
+    // Add notification listeners for debugging
+    const notificationListener = Notifications.addNotificationReceivedListener(notification => {
+      console.log('🔔 Notification received:', notification);
+    });
+
+    const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('🔔 Notification response:', response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
   }, []);
   return (
-    <GroupProvider>
-      <PaperProvider>
-        <View style={{ flex: 1, paddingTop: height * 0.05, backgroundColor: "white" }}>
-          {/* 👇 Show only on Android */}
-          {Platform.OS === "android" && (
-            <StatusBar style="dark" backgroundColor="white" />
-          )}
+    <NotificationProvider>
+      <GroupProvider>
+        <PaperProvider>
+          <View style={{ flex: 1, paddingTop: height * 0.05, backgroundColor: "white" }}>
+            {/* 👇 Show only on Android */}
+            {Platform.OS === "android" && (
+              <StatusBar style="dark" backgroundColor="white" />
+            )}
 
-          <Stack screenOptions={{ headerShown: false }} />
-        </View>
-      </PaperProvider>
-    </GroupProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+          </View>
+        </PaperProvider>
+      </GroupProvider>
+    </NotificationProvider>
   );
 }

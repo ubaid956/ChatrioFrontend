@@ -10,6 +10,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { connectSocket, getSocket } from '@/utils/socket';
+import { usePushTokenRegistration } from '@/hooks/usePushTokenRegistration';
 
 const { height, width } = Dimensions.get('window')
 
@@ -21,6 +22,9 @@ const Chats = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Auto-register push token when user is authenticated
+  const { expoPushToken } = usePushTokenRegistration();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -38,7 +42,7 @@ const Chats = () => {
           setCurrentUser(userData);
         }
 
-        const response = await axios.get('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users', {
+        const response = await axios.get('https://chatrio-backend.onrender.com/api/auth/users', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -77,7 +81,7 @@ const Chats = () => {
             setCurrentUser(userData);
           }
 
-          const response = await axios.get('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users', {
+          const response = await axios.get('https://chatrio-backend.onrender.com/api/auth/users', {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (!isActive) return;
@@ -165,6 +169,7 @@ const Chats = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <HomeHeader
         title={t('home')}
+        titleKey={'Home'}
         avatar={currentUser?.pic}
       />
 

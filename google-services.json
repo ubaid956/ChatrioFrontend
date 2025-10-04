@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "250145305468-oha5oo05v2i0d5l3k1fvh2esdgdq56qg.apps.googleusercontent.com",
+          "client_id": "250145305468-cv784bbo90kau0ilgpdc1mih0hd5j3jr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.uaesoft.chatrio2",
-            "certificate_hash": "ea0c38816fbd37c4423410811e2c19bbd8b83c1f"
+            "certificate_hash": "aca6cf693c3fab6640ff2fbcb074f2fbd4ac3b4d"
           }
         },
         {

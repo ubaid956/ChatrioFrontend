@@ -1,16 +1,16 @@
 import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  useWindowDimensions, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  useWindowDimensions,
+  TouchableOpacity,
   Alert,
   Animated,
-  Pressable , Dimensions
+  Pressable, Dimensions
 } from 'react-native';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
   const { width, height } = useWindowDimensions();
   const totalVotes = poll.votes?.length || 0;
@@ -18,7 +18,7 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
   const scaleValue = React.useRef(new Animated.Value(1)).current;
 
   // Calculate votes per option and user's vote
-  const voteCountPerOption = poll.options.map((_, index) => 
+  const voteCountPerOption = poll.options.map((_, index) =>
     poll.votes?.filter(v => String(v.user) === String(currentUserId) && v.optionIndex === index).length || 0
   );
 
@@ -37,7 +37,7 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
 
   const handleVote = async (optionIndex) => {
     if (hasVoted || isVoting) return;
-    
+
     // Haptic feedback animation
     Animated.sequence([
       Animated.timing(scaleValue, {
@@ -75,7 +75,7 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
   const getResponsiveStyles = () => {
     const isSmallScreen = width < 375;
     const isMediumScreen = width >= 375 && width < 768;
-    
+
     return {
       maxWidth: isSmallScreen ? width * 0.85 : isMediumScreen ? width * 0.78 : width * 0.65,
       padding: isSmallScreen ? 12 : 16,
@@ -99,9 +99,9 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
             styles.progressBarFill,
             {
               width: animatedWidth,
-              backgroundColor: isSentByUser ? 
-                'rgba(255, 255, 255, 0.3)' : 
-                'rgba(105, 77, 240, 0.3)',
+              backgroundColor: isSentByUser ?
+                'rgba(255, 255, 255, 0.3)' :
+                'rgba(105, 77, 240, 0.4)',
             },
           ]}
         />
@@ -136,24 +136,19 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
             <Text style={styles.pollEmoji}>📊</Text>
           </View>
           <View style={styles.headerText}>
-            <Text style={[
-              styles.senderText, 
-              isSentByUser ? styles.textWhite : styles.textDark
-            ]}>
-              {isSentByUser ? 'You' : poll.sender?.name || 'Anonymous'}
-            </Text>
+
             <Text style={[
               styles.pollLabel,
               isSentByUser ? styles.textMuted : styles.textLightDark
             ]}>
-              Created a poll
+              Poll
             </Text>
           </View>
         </View>
 
         {/* Question */}
         <Text style={[
-          styles.questionText, 
+          styles.questionText,
           isSentByUser ? styles.textWhite : styles.textDark
         ]}>
           {poll.question}
@@ -173,15 +168,16 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
                 disabled={hasVoted || isVoting}
                 style={({ pressed }) => [
                   styles.optionContainer,
+                  !isSentByUser && styles.optionContainerReceived,
                   hasVoted && styles.optionContainerVoted,
                   isVotedByUser && styles.selectedOption,
                   isSentByUser && isVotedByUser && styles.sentSelectedOption,
-                  pressed && !hasVoted && styles.optionPressed,
+                  pressed && !hasVoted && (isSentByUser ? styles.optionPressed : styles.optionPressedReceived),
                 ]}
               >
                 {/* Progress Bar */}
                 {hasVoted && renderProgressBar(percent, idx)}
-                
+
                 {/* Option Content */}
                 <View style={styles.optionContent}>
                   <Text
@@ -195,13 +191,13 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
                   >
                     {option}
                   </Text>
-                  
+
                   {hasVoted && (
                     <View style={styles.voteInfo}>
                       {isVotedByUser && (
                         <View style={styles.checkmarkContainer}>
                           <Text style={[
-                            styles.checkmark, 
+                            styles.checkmark,
                             isSentByUser ? styles.textWhite : styles.textPurple
                           ]}>
                             ✓
@@ -237,12 +233,12 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={[
-            styles.totalVotesText, 
+            styles.totalVotesText,
             isSentByUser ? styles.textMuted : styles.textLightDark
           ]}>
             {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
           </Text>
-          
+
           {isVoting && (
             <View style={styles.loadingContainer}>
               <Text style={[
@@ -253,10 +249,10 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
               </Text>
             </View>
           )}
-          
+
           {!hasVoted && !isVoting && (
             <Text style={[
-              styles.votePrompt, 
+              styles.votePrompt,
               isSentByUser ? styles.textMuted : styles.textLightDark
             ]}>
               Tap an option to vote
@@ -271,7 +267,7 @@ const PollItem = ({ poll, isSentByUser, currentUserId, onVote, isVoting }) => {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 20,
-    width: width*0.7,
+    width: width * 0.7,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -286,7 +282,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
   },
   received: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#e4e6eb',
     borderTopLeftRadius: 4,
     borderBottomLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -344,11 +340,19 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     position: 'relative',
   },
+  optionContainerReceived: {
+    backgroundColor: 'rgba(240, 240, 240, 0.8)',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
   optionContainerVoted: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   optionPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    transform: [{ scale: 0.98 }],
+  },
+  optionPressedReceived: {
+    backgroundColor: 'rgba(105, 77, 240, 0.1)',
     transform: [{ scale: 0.98 }],
   },
   selectedOption: {
@@ -443,7 +447,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   receivedProgressBg: {
-    backgroundColor: '#694df0',
+    backgroundColor: '#d1d5db',
   },
   progressBarFill: {
     position: 'absolute',

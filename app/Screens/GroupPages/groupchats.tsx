@@ -47,6 +47,19 @@ import { globalStyles } from '@/Styles/globalStyles';
 
 
 const { width, height } = Dimensions.get('window');
+
+// Helper function to format duration consistently
+const formatDuration = (seconds) => {
+    if (typeof seconds === 'string') {
+        // If it's already formatted like "0:14" or has 's' like "14s", handle it
+        if (seconds.includes(':')) return seconds;
+        seconds = parseInt(seconds.replace('s', ''));
+    }
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+};
+
 const GroupChatScreen = () => {
     const navigation = useNavigation();
     const { groupData } = useGroup();
@@ -225,7 +238,7 @@ const GroupChatScreen = () => {
 
             if (!token) return console.error('Token not found');
 
-            const endpoint = `https://37prw4st-5000.asse.devtunnels.ms/api/messages/${groupId}/${groupType.toLowerCase()}`;
+            const endpoint = `https://chatrio-backend.onrender.com/api/messages/${groupId}/${groupType.toLowerCase()}`;
             console.log(`Fetching from endpoint: ${endpoint}`);
 
             const response = await axios.get(endpoint, {
@@ -249,7 +262,7 @@ const GroupChatScreen = () => {
                             id: msg._id,
                             type: 'audio',
                             audioUrl: msg.audio.url,
-                            duration: msg.audio.duration || '0:00', // Default duration if null
+                            duration: formatDuration(msg.audio.duration || 0),
                             senderId: msg.sender._id,
                             senderName: msg.sender.name,
                             senderPic: msg.sender.pic,
@@ -312,19 +325,37 @@ const GroupChatScreen = () => {
                     reminders: reminderArr = []
                 } = response.data || {};
 
-                const formattedMessages = msgArr.map((msg) => ({
-                    id: msg._id,
-                    type: 'text',
-                    text: msg.text,
-                    senderId: msg.sender._id,
-                    senderName: msg.sender.name,
-                    senderPic: msg.sender.pic,
-                    createdAt: msg.createdAt,
-                    time: new Date(msg.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                    }),
-                }));
+                const formattedMessages = msgArr.map((msg) => {
+                    if (msg.audio) {
+                        return {
+                            id: msg._id,
+                            type: 'audio',
+                            audioUrl: msg.audio.url,
+                            duration: formatDuration(msg.audio.duration || 0),
+                            senderId: msg.sender._id,
+                            senderName: msg.sender.name,
+                            senderPic: msg.sender.pic,
+                            createdAt: msg.createdAt,
+                            time: new Date(msg.createdAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }),
+                        };
+                    }
+                    return {
+                        id: msg._id,
+                        type: 'text',
+                        text: msg.text,
+                        senderId: msg.sender._id,
+                        senderName: msg.sender.name,
+                        senderPic: msg.sender.pic,
+                        createdAt: msg.createdAt,
+                        time: new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        }),
+                    };
+                });
 
                 const formattedShopping = shoppingArr.map(item => ({
                     id: item._id,
@@ -421,19 +452,37 @@ const GroupChatScreen = () => {
                 } = response.data || {};
 
                 // Format regular messages
-                const formattedMessages = msgArr.map((msg) => ({
-                    id: msg._id,
-                    type: 'text',
-                    text: msg.text,
-                    senderId: msg.sender._id,
-                    senderName: msg.sender.name,
-                    senderPic: msg.sender.pic,
-                    createdAt: msg.createdAt,
-                    time: new Date(msg.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                    }),
-                }));
+                const formattedMessages = msgArr.map((msg) => {
+                    if (msg.audio) {
+                        return {
+                            id: msg._id,
+                            type: 'audio',
+                            audioUrl: msg.audio.url,
+                            duration: formatDuration(msg.audio.duration || 0),
+                            senderId: msg.sender._id,
+                            senderName: msg.sender.name,
+                            senderPic: msg.sender.pic,
+                            createdAt: msg.createdAt,
+                            time: new Date(msg.createdAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }),
+                        };
+                    }
+                    return {
+                        id: msg._id,
+                        type: 'text',
+                        text: msg.text,
+                        senderId: msg.sender._id,
+                        senderName: msg.sender.name,
+                        senderPic: msg.sender.pic,
+                        createdAt: msg.createdAt,
+                        time: new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        }),
+                    };
+                });
 
                 // Format locations
                 const formattedLocations = locationArr.map((loc) => ({
@@ -547,7 +596,7 @@ const GroupChatScreen = () => {
                             id: msg._id,
                             type: 'audio',
                             audioUrl: msg.audio.url,
-                            duration: msg.audio.duration || '0:00', // Default duration if null
+                            duration: formatDuration(msg.audio.duration || 0),
                             senderId: msg.sender._id,
                             senderName: msg.sender.name,
                             senderPic: msg.sender.pic,
@@ -571,7 +620,6 @@ const GroupChatScreen = () => {
                             minute: '2-digit',
                         }),
                     };
-                    console.log('Formatted Messages', formattedMessages)
                 });
 
                 // Format polls
@@ -797,6 +845,28 @@ const GroupChatScreen = () => {
         };
     }, [groupId]);
 
+    // Auto-scroll to latest message when chat opens (like WhatsApp)
+    useEffect(() => {
+        if (messages.length > 0 && flatListRef.current) {
+            // Small delay to ensure FlatList is fully rendered
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: false });
+            }, 100);
+        }
+    }, [messages.length]); // Trigger when messages are loaded
+
+    // Auto-scroll to bottom when screen comes into focus (like WhatsApp)
+    useFocusEffect(
+        useCallback(() => {
+            if (messages.length > 0 && flatListRef.current) {
+                // Delay to ensure the screen is fully focused
+                setTimeout(() => {
+                    flatListRef.current?.scrollToEnd({ animated: true });
+                }, 200);
+            }
+        }, [messages.length])
+    );
+
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
             setTimeout(() => {
@@ -829,7 +899,7 @@ const GroupChatScreen = () => {
                 });
 
                 const response = await axios.post(
-                    'https://37prw4st-5000.asse.devtunnels.ms/api/messages/group',
+                    'https://chatrio-backend.onrender.com/api/messages/group',
                     formData,
                     {
                         headers: {
@@ -844,7 +914,7 @@ const GroupChatScreen = () => {
                     id: newMsg._id,
                     type: 'audio',
                     audioUrl: newMsg.audio.url,
-                    duration: duration + 's',
+                    duration: formatDuration(duration),
                     senderId: newMsg.sender._id,
                     senderName: newMsg.sender.name,
                     senderPic: newMsg.sender.pic,
@@ -862,7 +932,7 @@ const GroupChatScreen = () => {
             // For text messages
             else if (input.trim()) {
                 const response = await axios.post(
-                    'https://37prw4st-5000.asse.devtunnels.ms/api/messages/group',
+                    'https://chatrio-backend.onrender.com/api/messages/group',
                     {
                         groupId,
                         senderId,
@@ -931,7 +1001,7 @@ const GroupChatScreen = () => {
             );
 
             const response = await axios.post(
-                `https://37prw4st-5000.asse.devtunnels.ms/api/work/poll/${pollId}/vote`,
+                `https://chatrio-backend.onrender.com/api/work/poll/${pollId}/vote`,
                 { optionIndex },
                 {
                     headers: {

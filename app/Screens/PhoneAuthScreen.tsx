@@ -294,7 +294,7 @@ function PhoneAuthScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
- 
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
@@ -357,7 +357,7 @@ function PhoneAuthScreen() {
           <Text style={styles.title}>Enter Phone Number</Text>
           <TextInput
             style={styles.input}
-            placeholder="+92XXXXXXXXXX"
+            placeholder="+971XXXXXXXXX"
             keyboardType="phone-pad"
             value={phoneNumber}
             onChangeText={setPhoneNumber}

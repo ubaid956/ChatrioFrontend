@@ -74,6 +74,10 @@
     "photosPermission": "We need access to your photos to upload a profile picture",
     "successProfilePic": "Profile picture updated successfully",
     "errorProfilePic": "Failed to upload profile picture",
+    "deleteAccount": "Delete Account",
+    "deleteAccountWarning": "Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data including messages, groups, and profile information.",
+    "accountDeleted": "Your account has been successfully deleted",
+    "errorDeleteAccount": "Failed to delete account. Please try again or contact support.",
     "errorLogout": "Logout Error"
   },
   "helpCenter": {

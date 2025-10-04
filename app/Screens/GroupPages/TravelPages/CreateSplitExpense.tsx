@@ -35,7 +35,7 @@ const CreateSplitExpense = () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
         const res = await axios.get(
-          `https://37prw4st-5000.asse.devtunnels.ms/api/groups/${groupId}/users`,
+          `https://chatrio-backend.onrender.com/api/groups/${groupId}/users`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUsers(res.data.users);
@@ -68,7 +68,7 @@ const CreateSplitExpense = () => {
       };
 
       const response = await axios.post(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/travel/splitepense',
+        'https://chatrio-backend.onrender.com/api/travel/splitepense',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

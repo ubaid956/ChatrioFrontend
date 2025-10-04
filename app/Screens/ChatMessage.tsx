@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { useLocalSearchParams, useFocusEffect, useNavigation } from 'expo-router';
 import React, { useRef, useState, useEffect } from 'react';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
@@ -29,6 +29,7 @@ const { height } = Dimensions.get('window');
 
 const ChatMessage = () => {
   const { userId, groupId } = useLocalSearchParams();
+  const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const inputRef = useRef();
@@ -62,6 +63,28 @@ const ChatMessage = () => {
     getCurrentUserId();
   }, []);
 
+  // Auto-scroll to latest message when chat opens (like WhatsApp)
+  useEffect(() => {
+    if (messages.length > 0 && flatListRef.current) {
+      // Small delay to ensure FlatList is fully rendered
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: false });
+      }, 100);
+    }
+  }, [messages.length]); // Trigger when messages are loaded
+
+  // Auto-scroll to bottom when screen comes into focus (like WhatsApp)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (messages.length > 0 && flatListRef.current) {
+        // Delay to ensure the screen is fully focused
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 200);
+      }
+    }, [messages.length])
+  );
+
   const fetchData = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
@@ -69,7 +92,7 @@ const ChatMessage = () => {
         console.error('No token found');
         return;
       }
-      const response = await axios.get(`https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/${userId}`, {
+      const response = await axios.get(`https://chatrio-backend.onrender.com/api/auth/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const user = response.data.data.user;
@@ -143,7 +166,7 @@ const ChatMessage = () => {
           const token = await AsyncStorage.getItem('userToken');
           if (!token) return;
 
-          const response = await axios.get(`https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/${userId}`, {
+          const response = await axios.get(`https://chatrio-backend.onrender.com/api/auth/users/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -323,7 +346,7 @@ const ChatMessage = () => {
         formData.append('recipientId', userId);
 
         const response = await axios.post(
-          'https://37prw4st-5000.asse.devtunnels.ms/api/messages/private',
+          'https://chatrio-backend.onrender.com/api/messages/private',
           formData,
           {
             headers: {
@@ -378,7 +401,7 @@ const ChatMessage = () => {
 
         // Send via HTTP as fallback or primary
         const response = await axios.post(
-          'https://37prw4st-5000.asse.devtunnels.ms/api/messages/private',
+          'https://chatrio-backend.onrender.com/api/messages/private',
           {
             recipientId: userId,
             text: input,
@@ -566,7 +589,7 @@ const ChatMessage = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1 }}>
             <MessageHeader
-              // onBackPress={() => navigation.goBack()}
+              onBackPress={() => navigation.goBack()}
               userName={recipient.name}
               timestamp={new Date(recipient.lastActive).toLocaleTimeString()}
               onMenuPress={() => console.log('Menu pressed')}

@@ -49,7 +49,7 @@ const SubmitAssignment = () => {
             });
 
             const response = await axios.post(
-                `https://37prw4st-5000.asse.devtunnels.ms/api/school/assignment/${id}/submit`,
+                `https://chatrio-backend.onrender.com/api/school/assignment/${id}/submit`,
                 formData,
                 {
                     headers: {

@@ -1,95 +1,4 @@
 
-//Working perfectly 
-
-// import { View, Text, Alert, TouchableOpacity, ActivityIndicator } from 'react-native'
-// import React, { useState } from 'react'
-// import LoginHeader from '../Components/LoginHeader'
-// import Box from '../Components/Box'
-// import CustomButton from '../Components/CustomButton'
-// import { useRouter } from 'expo-router';
-
-// const Verification = () => {
-
-//   const router = useRouter()
-//   const [otp, setOtp] = useState('')  // You'll need to update your Box component to accept onChangeText or similar to update OTP
-//   const [isLoading, setIsLoading] = useState(false);
-//   const handleVerify = async () => {
-//     setIsLoading(true);
-//     try {
-//       const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/verifyOtp', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ OTP: otp }), // ✅ Use "OTP" (uppercase)
-//       });
-
-//       const data = await response.json();
-
-//       if (!response.ok) {
-//         Alert.alert('Verification Failed', data.message || 'Invalid OTP');
-//         return;
-//       }
-
-//       // ✅ OTP verified, pass userId to NewPassword screen
-//       // navigation.navigate('Signup-Login/NewPassword', {
-//       //   userId: data.userId,
-//       // })
-//       router.push({
-//         pathname: '/Screens/NewPassword',
-//         params: {
-//           userId: data.userId,
-//         },
-//       });
-
-
-//     } catch (error) {
-//       Alert.alert('Error', 'Something went wrong. Please try again.');
-//       console.error('OTP Verification error:', error);
-//     } finally {
-//       setIsLoading(false);
-//     }
-
-
-//     // router.push('Screens/NewPassword')
-
-//   };
-
-
-//   return (
-//     <View>
-//       <LoginHeader
-//         title="Verification"
-//         subtitle="Enter the code sent to your email or phone number"
-//         onPress={() => router.back()}
-//       />
-
-//       <Box value={otp} onChangeText={setOtp} />
-
-//       {/* <CustomButton title="Verify" onPress={handleVerify} /> */}
-
-//       <CustomButton
-//         title={
-//           isLoading ? (
-//             <ActivityIndicator size="small" color="white" />
-//           ) : (
-//             "Verify"
-//           )
-//         }
-//         onPress={handleVerify}
-//         disabled={isLoading}
-//       />
-//       <TouchableOpacity>
-
-
-//         <Text style={{ textAlign: 'center', marginTop: 20 }}>
-//           Didn't receive the code? <Text style={{ color: '#0758C2' }}>Resend</Text>
-//         </Text>
-//       </TouchableOpacity>
-//     </View>
-//   )
-// }
-
-// export default Verification
-
 
 
 import { View, Text, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
@@ -142,12 +51,13 @@ const Verification = () => {
       // Clear the stored confirmation data
       await AsyncStorage.removeItem('firebaseConfirmation');
 
+      // --- PUSH TOKEN LOGIC START ---
       if (next === 'login') {
-        const resp = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/login', {
+        const resp = await fetch('https://chatrio-backend.onrender.com/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            phone: phoneNumber,// Remove + for database storage
+            phone: phoneNumber.replace('+', ''), // Remove + for database storage (971525554980)
             firebaseToken: idToken
           })
         });
@@ -172,28 +82,17 @@ const Verification = () => {
 
         // --- PUSH TOKEN LOGIC START ---
         try {
-          const Notifications = await import('expo-notifications');
-          const Device = await import('expo-device');
-          let pushToken = null;
-          if (Device.isDevice) {
-            const { status: existingStatus } = await Notifications.getPermissionsAsync();
-            let finalStatus = existingStatus;
-            if (existingStatus !== 'granted') {
-              const { status } = await Notifications.requestPermissionsAsync();
-              finalStatus = status;
-            }
-            if (finalStatus === 'granted') {
-              pushToken = (await Notifications.getExpoPushTokenAsync()).data;
-              // Save push token to backend
-              await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/updatePushToken', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: payload._id, pushToken })
-              });
-            }
+          const { registerForPushNotificationsAsync } = await import('@/utils/registerForPushNotificationsAsync');
+          const pushToken = await registerForPushNotificationsAsync();
+          if (pushToken) {
+            await fetch('https://chatrio-backend.onrender.com/api/auth/updatePushToken', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: payload._id, pushToken })
+            });
           }
         } catch (pushErr) {
-          console.warn('Failed to update push token after phone login:', pushErr);
+          console.warn('Failed to update push token after Google login:', pushErr);
         }
         // --- PUSH TOKEN LOGIC END ---
 
@@ -202,13 +101,13 @@ const Verification = () => {
       }
 
       if (next === 'signup') {
-        const resp = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/register', {
+        const resp = await fetch('https://chatrio-backend.onrender.com/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: Array.isArray(params.fullName) ? params.fullName[0] : (params.fullName as string),
             email: Array.isArray(params.email) ? params.email[0] : (params.email as string),
-            phone: phoneNumber.replace('+', ''), // Remove + for database storage
+            phone: phoneNumber.replace('+', ''), // Remove + for database storage (971525554980)
             password: Array.isArray(params.password) ? params.password[0] : (params.password as string),
           })
         });
@@ -230,6 +129,24 @@ const Verification = () => {
         await AsyncStorage.setItem('userToken', payload.token);
         await AsyncStorage.setItem('userId', payload._id);
         await AsyncStorage.setItem('userData', JSON.stringify(payload));
+
+        // --- PUSH TOKEN LOGIC START ---
+        try {
+          const { registerForPushNotificationsAsync } = await import('@/utils/registerForPushNotificationsAsync');
+          const pushToken = await registerForPushNotificationsAsync();
+          if (pushToken) {
+            await fetch('https://chatrio-backend.onrender.com/api/auth/updatePushToken', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: payload._id, pushToken })
+            });
+            console.log('✅ Push token registered for new user:', payload._id);
+          }
+        } catch (pushErr) {
+          console.warn('Failed to register push token after signup:', pushErr);
+        }
+        // --- PUSH TOKEN LOGIC END ---
+
         router.replace('/(tabs)/chats');
         return;
       }
@@ -244,7 +161,7 @@ const Verification = () => {
   };
 
   return (
-    <View style={{ backgroundColor: '#fff' }}>
+    <View style={{ backgroundColor: '#fff', flex: 1 }}>
       <LoginHeader
         title="Verification"
         subtitle={`Enter the code sent to ${phoneNumber}`}
@@ -266,7 +183,6 @@ const Verification = () => {
       />
 
       <TouchableOpacity onPress={() => {
-        // Implement resend logic here
         Alert.alert('OTP Resent', 'A new OTP has been sent to your phone');
       }}>
         <Text style={{ textAlign: 'center', marginTop: 20 }}>

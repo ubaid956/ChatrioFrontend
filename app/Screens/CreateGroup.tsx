@@ -52,7 +52,7 @@ const CreateGroup = () => {
                 }
 
                 const res = await axios.get(
-                    'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users',
+                    'https://chatrio-backend.onrender.com/api/auth/users',
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setUsers(res.data.data);
@@ -78,7 +78,7 @@ const CreateGroup = () => {
 
 
             await axios.post(
-                'https://37prw4st-5000.asse.devtunnels.ms/api/groups',
+                'https://chatrio-backend.onrender.com/api/groups',
                 { name: groupName, users: selectedUsers, type: groupType },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -140,7 +140,7 @@ const CreateGroup = () => {
             };
 
             await axios.post(
-                'https://37prw4st-5000.asse.devtunnels.ms/api/groups',
+                'https://chatrio-backend.onrender.com/api/groups',
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -168,6 +168,7 @@ const CreateGroup = () => {
 
             <HomeHeader
                 title={selectionMode ? `${selectedUsers.length}` : 'Create Group'}
+                titleKey="CreateGroup"
                 createGroup
                 avatar={currentUser?.pic}
                 rightAction={() => {
@@ -175,7 +176,7 @@ const CreateGroup = () => {
                         setShowGroupModal(true);
                     }
                 }}
-                rightText={selectionMode && selectedUsers.length > 0 ? 'New Group' : 'New Group'}
+                rightText={'New Group'}
             />
 
             <Modal

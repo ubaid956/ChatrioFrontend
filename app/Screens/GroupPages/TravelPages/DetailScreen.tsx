@@ -170,7 +170,7 @@ const DetailScreen = () => {
       }
 
       await axios.put(
-        `https://37prw4st-5000.asse.devtunnels.ms/api/travel/${checklistId}/${itemId}/toggle`,
+        `https://chatrio-backend.onrender.com/api/travel/${checklistId}/${itemId}/toggle`,
         {},
         {
           headers: {

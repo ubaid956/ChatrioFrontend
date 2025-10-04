@@ -137,7 +137,7 @@ export default function CreateFeatures() {
 
       switch (normalizedType) {
         case 'task':
-          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/task';
+          url = 'https://chatrio-backend.onrender.com/api/work/task';
           payload = {
             groupId,
             title: formData.title,
@@ -151,7 +151,7 @@ export default function CreateFeatures() {
           break;
 
         case 'idea':
-          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/idea';
+          url = 'https://chatrio-backend.onrender.com/api/work/idea';
           payload = {
             groupId,
             title: formData.title,
@@ -161,7 +161,7 @@ export default function CreateFeatures() {
           break;
 
         case 'note':
-          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/note';
+          url = 'https://chatrio-backend.onrender.com/api/work/note';
           payload = {
             groupId,
             title: formData.title,
@@ -183,7 +183,7 @@ export default function CreateFeatures() {
             return;
           }
 
-          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/poll';
+          url = 'https://chatrio-backend.onrender.com/api/work/poll';
           payload = {
             groupId,
             question: formData.title,
@@ -193,7 +193,7 @@ export default function CreateFeatures() {
           break;
 
         case 'meeting':
-          url = 'https://37prw4st-5000.asse.devtunnels.ms/api/work/create-meeting';
+          url = 'https://chatrio-backend.onrender.com/api/work/create-meeting';
           payload = {
             groupId,
             topic: formData.topic,

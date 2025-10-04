@@ -51,7 +51,7 @@ const CreateBudget = () => {
       };
 
       const response = await axios.post(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/home/addbudget',
+        'https://chatrio-backend.onrender.com/api/home/addbudget',
         payload,
         {
           headers: {

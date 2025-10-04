@@ -43,7 +43,7 @@ const CreateShoppingList = () => {
       }
 
       const response = await axios.post(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/home/shoppingList',
+        'https://chatrio-backend.onrender.com/api/home/shoppingList',
         {
           groupId,
           items: validItems,
@@ -80,7 +80,7 @@ const CreateShoppingList = () => {
             <Text style={groupStyle.label}>Item Name</Text>
             <TextInput
               placeholder="Enter Item Name"
-                          placeholderTextColor="#999"
+              placeholderTextColor="#999"
 
               value={item.name}
               onChangeText={(text) => {
@@ -94,7 +94,7 @@ const CreateShoppingList = () => {
             <Text style={groupStyle.label}>Quantity</Text>
             <TextInput
               placeholder="Enter Quantity e.g. 2KG, 3L"
-                          placeholderTextColor="#999"
+              placeholderTextColor="#999"
 
               value={item.quantity}
               onChangeText={(text) => {

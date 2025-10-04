@@ -55,39 +55,15 @@ const Login_2 = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isPasswordVisible, setPasswordVisible] = useState(false);
 
-    async function registerForPushNotificationsAsync() {
-        let token;
-
-        if (Device.isDevice) {
-            const { status: existingStatus } = await Notifications.getPermissionsAsync();
-            let finalStatus = existingStatus;
-
-            if (existingStatus !== 'granted') {
-                const { status } = await Notifications.requestPermissionsAsync();
-                finalStatus = status;
-            }
-
-            if (finalStatus !== 'granted') {
-                alert('Failed to get push token for push notifications!');
-                return;
-            }
-
-            token = (await Notifications.getExpoPushTokenAsync()).data;
-            console.log('Expo Push Token:', token);
-        } else {
-            alert('Must use physical device for push notifications');
+    // Use shared helper to register for push notifications (ensures projectId is passed)
+    async function registerForPushNotificationsAsyncLocal() {
+        try {
+            const { registerForPushNotificationsAsync } = await import('@/utils/registerForPushNotificationsAsync');
+            return await registerForPushNotificationsAsync();
+        } catch (err) {
+            console.warn('Failed to register for push notifications:', err);
+            return null;
         }
-        if (Platform.OS === 'android') {
-            await Notifications.setNotificationChannelAsync('default', {
-                name: 'default',
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: '#FF231F7C',
-            });
-        }
-
-
-        return token;
     }
 
 
@@ -98,13 +74,15 @@ const Login_2 = () => {
             console.log('=== FRONTEND LOGIN ATTEMPT ===');
             console.log('Phone from params:', phoneNumber);
             console.log('Password entered:', values.password ? '[PRESENT]' : '[MISSING]');
-            console.log('API endpoint:', 'https://37prw4st-5000.asse.devtunnels.ms/api/auth/login');
+            console.log('API endpoint:', 'https://chatrio-backend.onrender.com/api/auth/login');
 
-            const requestData = { phone: phoneNumber, password: values.password };
+            // Remove + prefix to match backend format (971525554980)
+            const phoneWithoutPlus = phoneNumber.startsWith('+') ? phoneNumber.substring(1) : phoneNumber;
+            const requestData = { phone: phoneWithoutPlus, password: values.password };
             console.log('Request data being sent:', requestData);
 
             const response = await axios.post(
-                `https://37prw4st-5000.asse.devtunnels.ms/api/auth/login`,
+                `https://chatrio-backend.onrender.com/api/auth/login`,
                 requestData
             );
 
@@ -147,28 +125,26 @@ const Login_2 = () => {
 
                 if (finalStatus === 'granted') {
                     console.log('✅ Getting Expo push token...');
-                    pushToken = (await Notifications.getExpoPushTokenAsync({
-                        projectId: '44a65b4e-35c1-4b45-947a-cd0f83f25096',
-                    })).data;
+                    pushToken = await registerForPushNotificationsAsyncLocal();
                     console.log(`📱 Expo Push Token (${Platform.OS}):`, pushToken);
 
                     // Test notification for Android
-                    if (Platform.OS === 'android') {
-                        console.log('🧪 Sending test Android notification...');
-                        await Notifications.scheduleNotificationAsync({
-                            content: {
-                                title: "Chatrio Login Success",
-                                body: "Welcome! Push notifications are working on Android 🎉",
-                                sound: 'default',
-                                data: { test: true },
-                            },
-                            trigger: { seconds: 2 },
-                        });
-                    }
+                    // if (Platform.OS === 'android') {
+                    //     console.log('🧪 Sending test Android notification...');
+                    //     await Notifications.scheduleNotificationAsync({
+                    //         content: {
+                    //             title: "Chatrio Login Success",
+                    //             body: "Welcome! Push notifications are working on Android 🎉",
+                    //             sound: 'default',
+                    //             data: { test: true },
+                    //         },
+                    //         trigger: { seconds: 2 },
+                    //     });
+                    // }
 
                     // Save push token to backend
                     const updateRes = await axios.post(
-                        `https://37prw4st-5000.asse.devtunnels.ms/api/auth/updatePushToken`,
+                        `https://chatrio-backend.onrender.com/api/auth/updatePushToken`,
                         { userId: user._id, pushToken },
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
@@ -176,7 +152,7 @@ const Login_2 = () => {
 
                     // Fetch updated user to confirm pushToken
                     const updatedUserRes = await axios.get(
-                        `https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/${user._id}`,
+                        `https://chatrio-backend.onrender.com/api/auth/users/${user._id}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
 
@@ -185,67 +161,89 @@ const Login_2 = () => {
 
                     // Debug notification setup with Android-specific checks
                     const debugRes = await axios.post(
-                        `https://37prw4st-5000.asse.devtunnels.ms/api/auth/debug-notifications`,
+                        `https://chatrio-backend.onrender.com/api/auth/debug-notifications`,
                         { userId: user._id },
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
                     console.log("🔍 Debug info:", debugRes.data);
 
                     // Android-specific notification permission check
-                    if (Platform.OS === 'android') {
-                        const permissionStatus = await Notifications.getPermissionsAsync();
-                        console.log("📱 Android notification permissions:", permissionStatus);
+                    // if (Platform.OS === 'android') {
+                    //     const permissionStatus = await Notifications.getPermissionsAsync();
+                    //     console.log("📱 Android notification permissions:", permissionStatus);
 
-                        // Check if notification channels are created
-                        try {
-                            const channels = await Notifications.getNotificationChannelsAsync();
-                            console.log("📱 Android notification channels:", channels);
-                        } catch (error) {
-                            console.log("⚠️ Could not get notification channels:", error);
-                        }
-                    }
+                    //     // Check if notification channels are created
+                    //     try {
+                    //         const channels = await Notifications.getNotificationChannelsAsync();
+                    //         console.log("📱 Android notification channels:", channels);
+
+                    //         // Test local notification to verify channel setup
+                    //         await Notifications.scheduleNotificationAsync({
+                    //             content: {
+                    //                 title: "Test Notification 📱",
+                    //                 body: "This is a test to verify Android notifications are working",
+                    //                 data: { test: true },
+                    //             },
+                    //             trigger: null, // Show immediately
+                    //         });
+                    //         console.log("✅ Test notification scheduled");
+
+                    //         // Test with chat-messages channel specifically
+                    //         await Notifications.scheduleNotificationAsync({
+                    //             content: {
+                    //                 title: "Chat Test 📱",
+                    //                 body: "Testing chat-messages channel specifically",
+                    //                 data: { test: true, channel: 'chat-messages' },
+                    //             },
+                    //             trigger: null,
+                    //         });
+                    //         console.log("✅ Chat channel test notification scheduled");
+                    //     } catch (error) {
+                    //         console.log("⚠️ Could not get notification channels or schedule test:", error);
+                    //     }
+                    // }
 
                     // Show success with debug info
-                    Alert.alert(
-                        "Login Successful",
-                        `Platform: ${Platform.OS}\nPush token: ${savedPushToken.slice(0, 20)}...\nToken valid: ${debugRes.data.debug?.tokenValid ? 'Yes' : 'No'}`,
-                        [
-                            {
-                                text: "Test Android Notification",
-                                onPress: async () => {
-                                    try {
-                                        console.log("🧪 Testing Android notification...");
+                    // Alert.alert(
+                    //     "Login Successful",
+                    //     `Platform: ${Platform.OS}\nPush token: ${savedPushToken.slice(0, 20)}...\nToken valid: ${debugRes.data.debug?.tokenValid ? 'Yes' : 'No'}`,
+                    //     [
+                    //         {
+                    //             text: "Test Android Notification",
+                    //             onPress: async () => {
+                    //                 try {
+                    //                     console.log("🧪 Testing Android notification...");
 
-                                        // First test a local notification
-                                        if (Platform.OS === 'android') {
-                                            await Notifications.scheduleNotificationAsync({
-                                                content: {
-                                                    title: "Local Test 🧪",
-                                                    body: "This is a local Android notification test",
-                                                    data: { test: true },
-                                                },
-                                                trigger: null, // Show immediately
-                                            });
-                                            console.log("✅ Local notification sent");
-                                        }
+                    //                     // First test a local notification
+                    //                     if (Platform.OS === 'android') {
+                    //                         await Notifications.scheduleNotificationAsync({
+                    //                             content: {
+                    //                                 title: "Local Test 🧪",
+                    //                                 body: "This is a local Android notification test",
+                    //                                 data: { test: true },
+                    //                             },
+                    //                             trigger: null, // Show immediately
+                    //                         });
+                    //                         console.log("✅ Local notification sent");
+                    //                     }
 
-                                        // Then test remote notification
-                                        const testRes = await axios.post(
-                                            `https://37prw4st-5000.asse.devtunnels.ms/api/auth/test-notification`,
-                                            { userId: user._id, platform: Platform.OS },
-                                            { headers: { Authorization: `Bearer ${token}` } }
-                                        );
-                                        console.log("🚀 Remote notification result:", testRes.data);
-                                        Alert.alert("Tests Sent", "Check your device for both local and remote notifications!");
-                                    } catch (err) {
-                                        console.error("❌ Test notification error:", err);
-                                        Alert.alert("Test Failed", "Could not send test notifications");
-                                    }
-                                }
-                            },
-                            { text: "OK" }
-                        ]
-                    );
+                    //                     // Then test remote notification
+                    //                     const testRes = await axios.post(
+                    //                         `https://chatrio-backend.onrender.com/api/auth/test-notification`,
+                    //                         { userId: user._id, platform: Platform.OS },
+                    //                         { headers: { Authorization: `Bearer ${token}` } }
+                    //                     );
+                    //                     console.log("🚀 Remote notification result:", testRes.data);
+                    //                     Alert.alert("Tests Sent", "Check your device for both local and remote notifications!");
+                    //                 } catch (err) {
+                    //                     console.error("❌ Test notification error:", err);
+                    //                     Alert.alert("Test Failed", "Could not send test notifications");
+                    //                 }
+                    //             }
+                    //         },
+                    //         { text: "OK" }
+                    //     ]
+                    // );
                 } else {
                     Alert.alert("Push Notifications permission denied!");
                 }

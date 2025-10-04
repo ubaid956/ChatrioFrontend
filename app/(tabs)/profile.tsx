@@ -52,7 +52,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/profile',
+        'https://chatrio-backend.onrender.com/api/auth/users/profile',
         { bio: newAbout },
         {
           headers: {
@@ -87,6 +87,55 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      t('profile.deleteAccount'),
+      t('profile.deleteAccountWarning'),
+      [
+        {
+          text: t('cancel'),
+          style: 'cancel'
+        },
+        {
+          text: t('profile.deleteAccount'),
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              const userToken = await AsyncStorage.getItem('userToken');
+              if (!userToken) {
+                throw new Error('User not authenticated');
+              }
+
+              // Call backend to delete account
+              const response = await axios.delete(
+                'https://chatrio-backend.onrender.com/api/auth/users/delete-account',
+                {
+                  headers: {
+                    'Authorization': `Bearer ${userToken}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+
+              if (response.status === 200) {
+                // Clear local data
+                await AsyncStorage.multiRemove(['userToken', 'userData', 'userId', 'pushToken']);
+                Alert.alert(t('success'), t('profile.accountDeleted'));
+                router.push('/Screens/Login');
+              }
+            } catch (error) {
+              console.error('Account deletion error:', error);
+              Alert.alert(t('error'), t('profile.errorDeleteAccount'));
+            } finally {
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
 
@@ -139,7 +188,7 @@ const Profile = () => {
       console.log('FormData created, sending request...');
 
       const response = await axios.put(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/profile',
+        'https://chatrio-backend.onrender.com/api/auth/users/profile',
         formData,
         {
           headers: {
@@ -419,6 +468,7 @@ const Profile = () => {
 
             <Profile_cart iconComponent={MaterialIcons} iconName="help" text={t('profile.helpCenter')} onPress={() => router.push('/Screens/Profile_Pages/HelpCenter')} />
             <Profile_cart iconComponent={MaterialIcons} iconName="privacy-tip" text={t('profile.termsPrivacy')} onPress={() => router.push('/Screens/Profile_Pages/TermsAndPrivacy')} />
+
           </View>
         </View>
 
@@ -426,6 +476,13 @@ const Profile = () => {
           title={loading ? <ActivityIndicator size="small" color="white" /> : t('profile.logout')}
           onPress={handleLogout}
           disabled={loading}
+        />
+
+        <CustomButton
+          title={t('profile.deleteAccount')}
+          onPress={handleDeleteAccount}
+          disabled={loading}
+          style={{ backgroundColor: '#dc2626', marginTop: 10 }}
         />
       </ScrollView>
       <Modal

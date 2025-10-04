@@ -54,7 +54,7 @@ const CreateChecklist = () => {
       };
 
       const response = await axios.post(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/travel/checklist',
+        'https://chatrio-backend.onrender.com/api/travel/checklist',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

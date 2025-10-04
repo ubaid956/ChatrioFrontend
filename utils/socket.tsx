@@ -1,7 +1,7 @@
 // socket.js
 import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = "https://37prw4st-5000.asse.devtunnels.ms";
+const SOCKET_URL = "https://chatrio-backend.onrender.com";
 
 let socket: Socket | undefined;
 

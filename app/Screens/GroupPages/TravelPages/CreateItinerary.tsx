@@ -61,7 +61,7 @@ const CreateItinerary = () => {
             };
 
             const response = await axios.post(
-                'https://37prw4st-5000.asse.devtunnels.ms/api/travel/itinerary',
+                'https://chatrio-backend.onrender.com/api/travel/itinerary',
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -159,7 +159,7 @@ const CreateItinerary = () => {
                         <View key={idx}>
                             {['name', 'address', 'checkIn', 'checkOut', 'bookingRef'].map((f) => (
                                 <TextInput key={f} placeholderTextColor="#999"
-                                     placeholder={f} value={acc[f]} onChangeText={(t) => updateNestedField(idx, f, t, setAccommodations, accommodations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
+                                    placeholder={f} value={acc[f]} onChangeText={(t) => updateNestedField(idx, f, t, setAccommodations, accommodations)} style={[groupStyle.input, { marginBottom: height * 0.01 }]} />
                             ))}
                         </View>
                     ))}

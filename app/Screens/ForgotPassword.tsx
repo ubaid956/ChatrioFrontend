@@ -25,7 +25,7 @@ const ForgotPassword = () => {
 
         setErrorMessage('');
         try {
-            const res = await axios.post('https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/forgot', { email });
+            const res = await axios.post('https://chatrio-backend.onrender.com/api/auth/users/forgot', { email });
 
             if (res.status === 200) {
                 router.push({

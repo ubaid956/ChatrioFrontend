@@ -39,7 +39,7 @@ const CreateEvent = () => {
 
       const payload = { groupId, ...formData };
       const response = await axios.post(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/home/createEvent',
+        'https://chatrio-backend.onrender.com/api/home/createEvent',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

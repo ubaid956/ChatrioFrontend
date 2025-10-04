@@ -61,7 +61,7 @@ const SignUpScreen = () => {
                 if (formattedPhone.startsWith('0')) {
                     formattedPhone = formattedPhone.substring(1);
                 }
-                formattedPhone = `+92${formattedPhone}`;
+                formattedPhone = `+971${formattedPhone}`;
             }
 
             const confirmation = await auth().signInWithPhoneNumber(formattedPhone);

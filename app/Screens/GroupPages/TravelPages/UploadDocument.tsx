@@ -78,7 +78,7 @@
 //       });
 
 //       const response = await axios.post(
-//         `https://37prw4st-5000.asse.devtunnels.ms/api/travel/document/${groupId}`,
+//         `https://chatrio-backend.onrender.com/api/travel/document/${groupId}`,
 //         formData,
 //         {
 //           headers: {
@@ -268,8 +268,8 @@ const UploadDocument = () => {
       // ✅ Set the correct endpoint based on context
       const endpoint =
         context === 'school'
-          ? `https://37prw4st-5000.asse.devtunnels.ms/api/school/uploadResource/${groupId}`
-          : `https://37prw4st-5000.asse.devtunnels.ms/api/travel/document/${groupId}`;
+          ? `https://chatrio-backend.onrender.com/api/school/uploadResource/${groupId}`
+          : `https://chatrio-backend.onrender.com/api/travel/document/${groupId}`;
 
       const response = await axios.post(endpoint, formData, {
         headers: {

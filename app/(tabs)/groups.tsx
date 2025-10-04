@@ -36,7 +36,7 @@ const Groups = () => {
         setCurrentUser(userData);
       }
 
-      const res = await axios.get('https://37prw4st-5000.asse.devtunnels.ms/api/groups', {
+      const res = await axios.get('https://chatrio-backend.onrender.com/api/groups', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -73,6 +73,7 @@ const Groups = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <HomeHeader
         title={t(`categories.${activeTab.toLowerCase()}`)}
+        titleKey={activeTab}
         //  createGroup
         avatar={currentUser?.pic}
         selectedTab={activeTab} // Pass the active tab to the header

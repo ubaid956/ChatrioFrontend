@@ -24,7 +24,7 @@ const InputField = ({
     onBlur,
 }) => {
     const [isPasswordVisible, setPasswordVisible] = useState(false);
-    const countryCode = "+92"; // Static country code
+    const countryCode = "+971"; // UAE country code
 
     if (isDropdown) {
         return (

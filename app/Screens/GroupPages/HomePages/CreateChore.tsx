@@ -40,7 +40,7 @@ const CreateChore = () => {
             try {
                 const token = await AsyncStorage.getItem('userToken');
                 const response = await axios.get(
-                    `https://37prw4st-5000.asse.devtunnels.ms/api/groups/${groupId}/users`,
+                    `https://chatrio-backend.onrender.com/api/groups/${groupId}/users`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setUsers(response.data.users);
@@ -64,7 +64,7 @@ const CreateChore = () => {
 
             const payload = { groupId, ...formData, sender };
             const response = await axios.post(
-                'https://37prw4st-5000.asse.devtunnels.ms/api/home/createChore',
+                'https://chatrio-backend.onrender.com/api/home/createChore',
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

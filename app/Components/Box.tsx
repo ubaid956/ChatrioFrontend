@@ -24,9 +24,11 @@ const Box = ({ value = '', onChangeText }) => {
     const combined = newValues.join('');
     onChangeText && onChangeText(combined);
 
-    if (text && index < 4) {
+    // Move focus forward when a digit is entered (allow index 0..4 to move to next)
+    if (text && index < 5) {
       inputRefs.current[index + 1]?.focus();
     } else if (!text && index > 0) {
+      // Move focus back when the current box is cleared
       inputRefs.current[index - 1]?.focus();
     }
   };

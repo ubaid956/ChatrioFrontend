@@ -53,7 +53,7 @@ const About = () => {
             if (!userToken) throw new Error('User not authenticated');
 
             const response = await axios.put(
-                'https://37prw4st-5000.asse.devtunnels.ms/api/auth/users/profile',
+                'https://chatrio-backend.onrender.com/api/auth/users/profile',
                 { bio: newAbout },
                 {
                     headers: {

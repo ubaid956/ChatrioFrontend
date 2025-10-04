@@ -12,7 +12,7 @@
       "bundleIdentifier": "com.uaesoft.chatrio2",
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
-      "icon": "./assets/images/app_logo.png",
+      "icon": "./assets/images/chatrio_logo_trans.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "We need your location to share it with your group.",
@@ -60,7 +60,16 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "expo-web-browser",
-      "expo-notifications"
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification_icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "androidMode": "default",
+          "androidCollapsedTitle": "#{unread_notifications} new interactions"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -71,6 +80,6 @@
         "projectId": "44a65b4e-35c1-4b45-947a-cd0f83f25096"
       }
     },
-    "owner": "ubaid_anxari_956"
+    "owner": "ubaid-transfer-org"
   }
 }

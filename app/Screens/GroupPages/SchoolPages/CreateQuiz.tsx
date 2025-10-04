@@ -61,7 +61,7 @@ const CreateQuiz = () => {
       };
 
       const res = await axios.post(
-        'https://37prw4st-5000.asse.devtunnels.ms/api/school/quiz',
+        'https://chatrio-backend.onrender.com/api/school/quiz',
         payload,
         {
           headers: {

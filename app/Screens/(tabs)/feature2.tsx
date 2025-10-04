@@ -58,7 +58,7 @@ const feature2 = () => {
         return;
       }
       const response = await axios.get(
-        `https://37prw4st-5000.asse.devtunnels.ms/api/home/event/${groupData.groupId}`,
+        `https://chatrio-backend.onrender.com/api/home/event/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ const feature2 = () => {
       }
 
       const response = await axios.get(
-        `https://37prw4st-5000.asse.devtunnels.ms/api/work/meeting/${groupData.groupId}`,
+        `https://chatrio-backend.onrender.com/api/work/meeting/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ const feature2 = () => {
       if (!token) return;
 
       const response = await axios.get(
-        `https://37prw4st-5000.asse.devtunnels.ms/api/school/assignment/${groupData.groupId}`,
+        `https://chatrio-backend.onrender.com/api/school/assignment/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -128,7 +128,7 @@ const feature2 = () => {
       }
 
       const res = await axios.get(
-        `https://37prw4st-5000.asse.devtunnels.ms/api/travel/checklist/${groupData.groupId}`,
+        `https://chatrio-backend.onrender.com/api/travel/checklist/${groupData.groupId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

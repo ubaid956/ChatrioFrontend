@@ -23,7 +23,7 @@ const Groups = () => {
         setLoading(true);
         const token = await AsyncStorage.getItem('userToken');
         try {
-            const response = await axios.get(`https://37prw4st-5000.asse.devtunnels.ms/api/groups/${groupData.groupType}`, {
+            const response = await axios.get(`https://chatrio-backend.onrender.com/api/groups/${groupData.groupType}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -63,7 +63,7 @@ const CreateAssignment = () => {
             };
 
             const res = await axios.post(
-                'https://37prw4st-5000.asse.devtunnels.ms/api/school/assignment', // adjust if needed
+                'https://chatrio-backend.onrender.com/api/school/assignment', // adjust if needed
                 payload,
                 {
                     headers: {

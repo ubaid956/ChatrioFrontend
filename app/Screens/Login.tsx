@@ -46,7 +46,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 // const getUserProfile = async (token) => {
 //     try {
-//         const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/google', {
+//         const response = await fetch('https://chatrio-backend.onrender.com/api/auth/google', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ WebBrowser.maybeCompleteAuthSession();
 const getUserProfile = async (token) => {
     try {
         console.log('Starting Google login process...');
-        const response = await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/google', {
+        const response = await fetch('https://chatrio-backend.onrender.com/api/auth/google', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -115,30 +115,9 @@ const getUserProfile = async (token) => {
         console.log('App Token:', appToken);
 
         // --- PUSH TOKEN LOGIC START ---
-        try {
-            const Notifications = await import('expo-notifications');
-            const Device = await import('expo-device');
-            let pushToken = null;
-            if (Device.isDevice && user?._id) {
-                const { status: existingStatus } = await Notifications.getPermissionsAsync();
-                let finalStatus = existingStatus;
-                if (existingStatus !== 'granted') {
-                    const { status } = await Notifications.requestPermissionsAsync();
-                    finalStatus = status;
-                }
-                if (finalStatus === 'granted') {
-                    pushToken = (await Notifications.getExpoPushTokenAsync()).data;
-                    // Save push token to backend
-                    await fetch('https://37prw4st-5000.asse.devtunnels.ms/api/auth/updatePushToken', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: user._id, pushToken })
-                    });
-                }
-            }
-        } catch (pushErr) {
-            console.warn('Failed to update push token after Google login:', pushErr);
-        }
+        // Note: Push token registration is now handled centrally via NotificationContext
+        // The token will be registered when the user navigates to the main app
+        console.log('✅ Google login successful - push token will be registered via NotificationContext');
         // --- PUSH TOKEN LOGIC END ---
 
         console.log("User ID:", user._id);

@@ -1,129 +1,3 @@
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   StyleSheet,
-//   Image,
-//   TouchableOpacity,
-//   Dimensions,
-//   Modal,
-// } from 'react-native';
-// import { Ionicons } from '@expo/vector-icons';
-
-// const { width } = Dimensions.get('window');
-
-// const moods = [
-//   { emoji: '💼', label: 'Work' },
-//   { emoji: '😌', label: 'Relaxed' },
-//   { emoji: '🎯', label: 'Focused' },
-//   { emoji: '🎉', label: 'Celebrating' },
-// ];
-
-// const HomeHeader = ({ title, time, avatar, createGroup,  rightAction, rightText }) => {
-//   const [selectedMood, setSelectedMood] = useState({ emoji: '🎯', label: 'Focused' });
-//   const [modalVisible, setModalVisible] = useState(false);
-
-//   const handleMoodSelect = (mood) => {
-//     setSelectedMood(mood);
-//     setModalVisible(false);
-//   };
-
-//   return (
-//     <View>
-//       {/* Header */}
-//       {/* <View style={styles.container}>
-//         <View style={styles.leftSection}>
-//           {!createGroup && (
-//             <Ionicons name="school" size={20} color="#fff" style={styles.icon} />
-//           )}
-//           <Text style={styles.title}>{title}</Text>
-
-
-//         </View>
-
-//         <Text style={styles.time}>{time}</Text>
-
-//         <View style={styles.rightSection}>
-//           {!createGroup && (
-//             <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.moodButton}>
-//               <Text style={styles.emoji}>{selectedMood.emoji}</Text>
-//             </TouchableOpacity>
-//           )}
-//           {!createGroup ? (
-//             <Image source={{ uri: avatar }} style={styles.avatar} />
-//           ) : (
-//             <TouchableOpacity >
-//               <Text style={styles.title}>New Group</Text>
-//             </TouchableOpacity>
-//           )}
-//         </View>
-//       </View> */}
-//       <View style={styles.container}>
-//         <View style={styles.leftSection}>
-//           {!createGroup && (
-//             <Ionicons name="school" size={20} color="#fff" style={styles.icon} />
-//           )}
-//           <Text style={styles.title}>{title}</Text>
-//         </View>
-
-//         <Text style={styles.time}>{time}</Text>
-
-//         <View style={styles.rightSection}>
-//           {!createGroup && (
-//             <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.moodButton}>
-//               <Text style={styles.emoji}>{selectedMood.emoji}</Text>
-//             </TouchableOpacity>
-//           )}
-//           {!createGroup ? (
-//             <Image source={{ uri: avatar }} style={styles.avatar} />
-//           ) : (
-//             <TouchableOpacity onPress={rightAction}>
-//               <Text style={styles.title}>{rightText || 'New Group'}</Text>
-//             </TouchableOpacity>
-//           )}
-//         </View>
-//       </View>
-
-//       {/* Mood Popup */}
-//       <Modal
-//         animationType="fade"
-//         transparent={true}
-//         visible={modalVisible}
-//         onRequestClose={() => setModalVisible(false)}
-//       >
-//         <TouchableOpacity
-//           style={styles.modalOverlay}
-//           activeOpacity={1}
-//           onPressOut={() => setModalVisible(false)}
-//         >
-//           <View style={styles.popup}>
-//             <Text style={styles.selectMoodText}>Select Mood</Text>
-//             <View style={styles.emojiRow}>
-//               {moods.map((mood, index) => (
-//                 <TouchableOpacity
-//                   key={index}
-//                   style={[
-//                     styles.emojiOption,
-//                     mood.label === selectedMood.label && styles.selectedMoodBox,
-//                   ]}
-//                   onPress={() => handleMoodSelect(mood)}
-//                 >
-//                   <Text style={styles.emoji}>{mood.emoji}</Text>
-//                   {mood.label === selectedMood.label && (
-//                     <Text style={styles.selectedLabel}>{mood.label}</Text>
-//                   )}
-//                 </TouchableOpacity>
-//               ))}
-//             </View>
-//           </View>
-//         </TouchableOpacity>
-//       </Modal>
-//     </View>
-//   );
-// };
-
-// export default HomeHeader;
-
 
 
 import React, { useState, useEffect } from 'react';
@@ -147,7 +21,9 @@ const moods = [
   { emoji: '🎉', label: 'Celebrating' },
 ];
 
-const HomeHeader = ({ title, time, avatar, createGroup, rightAction, rightText }) => {
+// title: localized display string
+// titleKey: language-independent key used for icon mapping (e.g. 'Home','Work','School','Travel')
+const HomeHeader = ({ title, titleKey, time, avatar, createGroup, rightAction, rightText, iconName }) => {
   const [selectedMood, setSelectedMood] = useState({ emoji: '🎯', label: 'Focused' });
   const [modalVisible, setModalVisible] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
@@ -175,19 +51,24 @@ const HomeHeader = ({ title, time, avatar, createGroup, rightAction, rightText }
     setModalVisible(false);
   };
   const renderIcon = () => {
-    if (title === 'Home') {
-      return <Ionicons name="home" size={20} color="#fff" style={styles.icon} />;
-    } else if (title === 'Work') {
-      return <Ionicons name="briefcase" size={20} color="#fff" style={styles.icon} />; // Use 'briefcase' for office
-    } else if (title === 'School') {
-      return <Ionicons name="school" size={20} color="#fff" style={styles.icon} />;
-    } else if (title === 'Travel') {
-      return <Ionicons name="globe" size={20} color="#fff" style={styles.icon} />;
-    }
-    else if (!createGroup) {
-      return <Ionicons name={title} size={20} color="#fff" style={styles.icon} />;
-    } else {
-      return null;
+    // If an explicit iconName prop is provided, use it (developer override)
+    if (iconName) return <Ionicons name={iconName} size={20} color="#fff" style={styles.icon} />;
+
+    // Map language-independent titleKey to icons; use titleKey (not localized title)
+    const key = titleKey || title; // fall back to title if no key provided
+    switch (key) {
+      case 'Home':
+        return <Ionicons name="home" size={20} color="#fff" style={styles.icon} />;
+      case 'Work':
+        return <Ionicons name="briefcase" size={20} color="#fff" style={styles.icon} />;
+      case 'School':
+        return <Ionicons name="school" size={20} color="#fff" style={styles.icon} />;
+      case 'Travel':
+        return <Ionicons name="globe" size={20} color="#fff" style={styles.icon} />;
+      default:
+        // Don't try to pass localized strings (like Arabic) as icon names — avoid warnings
+        if (!createGroup) return <Ionicons name="ellipsis-horizontal" size={20} color="#fff" style={styles.icon} />;
+        return null;
     }
   };
 
