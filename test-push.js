@@ -10,7 +10,7 @@ async function testPushNotification() {
 
     // Test with a sample Expo push token format
     // Replace with a real token from your device for actual testing
-    const testToken = 'ExponentPushToken[REPLACE_WITH_REAL_TOKEN_FROM_YOUR_DEVICE]';
+    const testToken = 'ExponentPushToken[iDVXEEO3hot2VRP2k9uArf]';
 
     console.log('📱 Testing with token:', testToken.substring(0, 30) + '...');
 
