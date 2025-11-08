@@ -14,7 +14,6 @@ import schoolRoutes from './routes/featuresRoutes/schoolRoutes.js';
 import homeRoutes from './routes/featuresRoutes/homeRoute.js';
 import travelRoutes from './routes/featuresRoutes/travelRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
-import testTokenRoute from './routes/testTokenRoute.js';
 import errorHandler from './middleware/errorHandler.js';
 import initSocket from './utils/socket.js';
 import fileUpload from 'express-fileupload';
@@ -42,7 +41,6 @@ app.use(express.static(join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/messages', messageRoutes);
-app.use('/api/test', testTokenRoute);
 
 // Features Routes
 app.use('/api/work', workRoutes);

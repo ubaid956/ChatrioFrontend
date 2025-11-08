@@ -716,6 +716,47 @@ export const updatePassword = async (req, res) => {
   }
 };
 
+
+// export const updateProfile = async (req, res) => {
+//   const userId = req.user._id; // Authenticated user ID from middleware
+//   const { name, pic } = req.body;
+
+//   if (!name || !pic) {
+//     return res.status(400).json({ message: "Please provide name or profile picture to update." });
+//   }
+
+//   try {
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found." });
+//     }
+
+//     if (name) user.name = name;
+//     if (pic) user.pic = pic;
+
+//     await user.save();
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Profile updated successfully.",
+//       user: {
+//         _id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         phone: user.phone,
+//         pic: user.pic,
+//         currentStatus: user.currentStatus,
+//         mood: user.mood,
+//       }
+//     });
+//   } catch (error) {
+//     console.error("Error updating profile:", error);
+//     res.status(500).json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
+
 export const updateProfile = async (req, res) => {
   const userId = req.user._id;
   const profilePic = req.files?.profilePic;

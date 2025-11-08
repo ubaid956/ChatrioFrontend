@@ -276,7 +276,7 @@ export const generateQuiz = async (req, res) => {
                 headers: {
                     Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
                     'Content-Type': 'application/json',
-                    'HTTP-Referer': 'https://m1p2hrxd-5000.asse.devtunnels.ms',
+                    'HTTP-Referer': 'http://localhost:3000',
                     'X-Title': 'QuizGenerator'
                 }
             }
